@@ -3,6 +3,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/authController.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
 
@@ -180,6 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 380,
                   child: TextButton(
                       onPressed: () {
+                        AuthentificationUser().authentification(
+                            emailController.text, passwordController.text);
                         Navigator.push(
                           context,
                           MaterialPageRoute(

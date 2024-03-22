@@ -33,7 +33,7 @@ class _MyWidgetState extends State<MyWidget> {
               child: Container(
                   margin: const EdgeInsets.only(top: 30),
                   padding: const EdgeInsets.only(
-                      top: 100, bottom: 10, left: 20, right: 80),
+                      top: 120, bottom: 10, left: 20, right: 80),
                   child: CanvasTouchDetector(
                     gesturesToOverride: const [
                       GestureType.onTapUp,
@@ -97,7 +97,7 @@ class _SinusoidalLinePainter extends CustomPainter {
 
     var myCanvas = TouchyCanvas(context, canvas);
     final paint = Paint()
-      ..color = const Color.fromRGBO(8, 65, 142, 1)
+      ..color = Color.fromARGB(255, 110, 112, 114)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -127,7 +127,7 @@ class _SinusoidalLinePainter extends CustomPainter {
       z = x + 55;
       y = i * 19 * yStep;
 
-      myCanvas.drawCircle(Offset(x, y), 10, pointPaint);
+      myCanvas.drawCircle(Offset(x, y), 0, pointPaint);
 
       final imageOffset = Offset(x, y - 60);
       final titlePainter = TextPainter(
