@@ -161,7 +161,7 @@ class _HomeeState extends State<Homee> {
                 width: 50.0,
                 height: 150.0,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color.fromARGB(255, 255, 253, 253),
                 ),
                 child: Row(children: [
                   Column(

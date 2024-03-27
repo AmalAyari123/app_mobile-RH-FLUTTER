@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 Future<http.Response> authUser(String email, String password) async {
-  var url = Uri.parse("http://192.168.1.14:3000/auth/login");
+  var url = Uri.parse("http://192.168.1.200:3000/auth/login");
   Map<String, String> requestBody = {
     'email': email,
     'password': password,

@@ -130,7 +130,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       child: IconButton(
                           onPressed: () {},
                           icon: const Icon(
-                            Icons.edit,
+                            Icons.add_photo_alternate,
                             size: 17,
                             color: Colors.white,
                           )),

@@ -3,8 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:myapp/provider/accountDetails.dart';
-import 'package:myapp/resum.dart';
+import 'package:myapp/step1.dart';
 import 'package:provider/provider.dart';
 
 class Splash extends StatefulWidget {
@@ -17,8 +16,6 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
-    AccountDetails accountDetails = context.watch<AccountDetails>();
-
     return AnimatedSplashScreen(
       splash: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -45,7 +42,7 @@ class _SplashState extends State<Splash> {
           ),
         ],
       ),
-      nextScreen: const MyWidget(),
+      nextScreen: const StepOne(),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       splashIconSize: 400,
       duration: 4000,

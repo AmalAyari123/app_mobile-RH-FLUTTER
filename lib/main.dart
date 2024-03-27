@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/provider/accountDetails.dart';
-import 'package:myapp/resum.dart';
+import 'package:myapp/admin/Employe.dart';
+import 'package:myapp/admin/add.dart';
+import 'package:myapp/admin/update.dart';
 import 'package:myapp/splash.dart';
+import 'package:myapp/step1.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => AccountDetails()),
-  ], child: const MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Splash());
+    return const MaterialApp(
+        debugShowCheckedModeBanner: false, home: HomePage());
   }
 }
