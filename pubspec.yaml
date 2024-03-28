@@ -55,6 +55,7 @@ dependencies:
   http: ^1.2.0
   flutter_spinkit: ^5.2.0
   flutter_slidable: ^3.1.0
+  ternav_icons: ^1.0.0
 
   table_calendar: ^3.1.0
 

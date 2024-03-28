@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/admin/Employe.dart';
+import 'package:myapp/admin/accueil.dart';
 import 'package:myapp/admin/add.dart';
 import 'package:myapp/admin/update.dart';
 import 'package:myapp/splash.dart';
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: HomePage());
+        debugShowCheckedModeBanner: false, home: accueil());
   }
 }

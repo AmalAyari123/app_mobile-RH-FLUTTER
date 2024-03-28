@@ -38,6 +38,7 @@ class _CardWidgetState extends State<CardWidget> {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return Update(
+                    id: widget.user.id,
                     name: widget.user.name,
                     email: widget.user.email,
                     soldeconge: widget.user.soldeConge,
