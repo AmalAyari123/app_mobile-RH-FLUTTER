@@ -1,12 +1,19 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
+import 'package:myapp/Model/departement.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:provider/provider.dart';
 
 class UpdateProfile extends StatefulWidget {
-  const UpdateProfile({super.key});
+  final User currentuser;
+  const UpdateProfile({super.key, required this.currentuser});
 
   @override
   State<UpdateProfile> createState() => _UpdateProfileState();
@@ -18,69 +25,117 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   TextEditingController tel = TextEditingController();
   String phoneNumber = '';
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+
+  TextEditingController cinController = TextEditingController();
+  TextEditingController numtelController = TextEditingController();
+  TextEditingController companyController = TextEditingController();
+  Departement? selectedDepartement;
+  String? selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with initial values
+    nameController = TextEditingController(text: widget.currentuser!.name);
+    emailController = TextEditingController(text: widget.currentuser!.email);
+    numtelController =
+        TextEditingController(text: widget.currentuser!.numTel.toString());
+    cinController =
+        TextEditingController(text: widget.currentuser!.numCIN.toString());
+
+    companyController =
+        TextEditingController(text: widget.currentuser!.companyGroup);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-        selectedItemColor: Colors.grey[500],
-        unselectedItemColor: Colors.grey[500],
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined, size: 30),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add_circle,
-              size: 40,
-              color: Color.fromRGBO(8, 65, 142, 1),
-            ),
-            label: 'Congés',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.history,
-              size: 30,
-            ),
-            label: 'Historique',
-          ),
-        ],
-        onTap: (index) {
-          // Handle navigation based on the selected index
-          setState(() {
-            _currentIndex = index;
-          });
+    ProviderUser providerUser = context.watch<ProviderUser>();
 
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Homee()),
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Absencee()),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Historique()),
-            );
-          }
-        },
+    List<User>? users = providerUser.employes;
+    ProviderDepartement providerDepartement =
+        context.watch<ProviderDepartement>();
+
+    List<Departement>? departements = providerDepartement.departements;
+    getDepartementsController(providerDepartement);
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey, width: 0.3),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.grey[500],
+          unselectedItemColor: Colors.grey[500],
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined, size: 30),
+              label: 'Accueil',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.add_circle,
+                size: 40,
+                color: Color.fromRGBO(8, 65, 142, 1),
+              ),
+              label: 'Congés',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.history,
+                size: 30,
+              ),
+              label: 'Historique',
+            ),
+          ],
+          onTap: (index) {
+            // Handle navigation based on the selected index
+            setState(() {
+              _currentIndex = index;
+            });
+
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Homee()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Absencee()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Historique()),
+              );
+            }
+          },
+        ),
       ),
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 20,
+            )),
         elevation: 6,
         shadowColor: Colors.grey,
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(8, 65, 142, 1),
         centerTitle: true,
         title: Text(
-          "Permission de sortir",
+          "Modifier votre profile",
           textAlign: TextAlign.center,
           style: SafeGoogleFont(
             'Lato',
@@ -90,7 +145,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
           ),
         ),
       ),
-      resizeToAvoidBottomInset: false,
       body: Container(
         height: MediaQuery.of(context).size.height - 190,
         width: MediaQuery.of(context).size.width,
@@ -140,6 +194,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               SizedBox(
                 height: 80,
                 child: IntlPhoneField(
+                  controller: numtelController,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color.fromARGB(255, 255, 255, 255),
@@ -151,7 +206,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    labelText: "Numero CIN",
+                    labelText: "Numero tel",
                     labelStyle: SafeGoogleFont(
                       'Lato',
                       fontSize: 19,
@@ -178,7 +233,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               SizedBox(
                 height: 50,
                 child: TextField(
-                    controller: cin,
+                    controller: cinController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: const Color.fromARGB(255, 255, 255, 255),
@@ -191,7 +246,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       label: Text(
-                        "Numero tel",
+                        "Numero CIN",
                         style: SafeGoogleFont(
                           'Lato',
                           fontSize: 20,
@@ -215,7 +270,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               SizedBox(
                 height: 50,
                 child: TextField(
-                    controller: cin,
+                    controller: nameController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: const Color.fromARGB(255, 255, 255, 255),
@@ -228,7 +283,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       label: Text(
-                        'Société',
+                        'Prénom et nom',
                         style: SafeGoogleFont(
                           'Lato',
                           fontSize: 22,
@@ -252,7 +307,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               SizedBox(
                 height: 50,
                 child: TextField(
-                    controller: cin,
+                    controller: emailController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: const Color.fromARGB(255, 255, 255, 255),
@@ -265,7 +320,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       label: Text(
-                        'Département',
+                        'Adresse e-mail',
                         style: SafeGoogleFont(
                           'Lato',
                           fontSize: 20,
@@ -288,39 +343,61 @@ class _UpdateProfileState extends State<UpdateProfile> {
               const SizedBox(height: 27),
               SizedBox(
                 height: 50,
-                child: TextField(
-                    controller: cin,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color.fromARGB(255, 255, 255, 255),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      label: Text(
-                        "Equipe",
-                        style: SafeGoogleFont(
-                          'Lato',
-                          fontSize: 19,
-                          fontWeight: FontWeight.w300,
-                          color: const Color.fromARGB(255, 34, 34, 37),
-                        ),
-                      ),
-                      labelStyle: SafeGoogleFont('Lato',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey),
-                      floatingLabelStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey,
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                    )),
+                child: DropdownButtonFormField2<String>(
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(vertical: 13),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 192, 187, 187)),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  value: departements!.isNotEmpty ?? false
+                      ? departements!.first.name
+                      : null, // Set default value
+                  items: departements!
+                      .map((item) => DropdownMenuItem<String>(
+                            value: item.name,
+                            child: Text(
+                              item.name ?? '',
+                              style: SafeGoogleFont(
+                                'Rubik',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+
+                  onChanged: (value) {
+                    selectedDepartement = departements!.firstWhere(
+                      (department) => department.name == value,
+                    );
+                    print(selectedDepartement);
+                  },
+                  onSaved: (value) {
+                    selectedValue = value.toString();
+                  },
+                  buttonStyleData: const ButtonStyleData(
+                    padding: EdgeInsets.only(right: 8),
+                  ),
+                  iconStyleData: const IconStyleData(
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.black45,
+                    ),
+                    iconSize: 24,
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    padding: EdgeInsets.symmetric(horizontal: 13),
+                  ),
+                ),
               ),
               const SizedBox(height: 27),
               SizedBox(
@@ -339,7 +416,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
                       label: Text(
-                        "Adresse e-mail",
+                        "Nom du groupe",
                         style: SafeGoogleFont(
                           'Lato',
                           fontSize: 21,
@@ -364,10 +441,34 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 width: 380,
                 child: TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Homee()),
-                      );
+                      widget.currentuser!.name = nameController.text.toString();
+                      widget.currentuser.email =
+                          emailController.text.toString();
+
+                      try {
+                        widget.currentuser.numTel =
+                            numtelController.text.isNotEmpty
+                                ? int.parse(numtelController.text)
+                                : null;
+                      } catch (e) {
+                        print(
+                            'Invalid input for numTel: ${numtelController.text}');
+                        widget.currentuser.numTel = null;
+                      }
+                      widget.currentuser.companyGroup =
+                          companyController.text.toString();
+                      widget.currentuser.DepartmentId =
+                          selectedDepartement != null
+                              ? selectedDepartement!.id
+                              : departements!.first.id;
+                      // ignore: prefer_if_null_operators
+                      widget.currentuser.departement =
+                          selectedDepartement != null
+                              ? selectedDepartement
+                              : departements.first;
+
+                      updateCurrentUserController(
+                          context, widget.currentuser, providerUser!);
                     },
                     style: TextButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(8, 65, 142, 1),

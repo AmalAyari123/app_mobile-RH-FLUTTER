@@ -1,11 +1,16 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart';
 import 'package:myapp/Controller/authController.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Model/user.dart';
+import 'package:myapp/admin/accueil.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
+import 'package:provider/provider.dart';
 
 enum FormData {
   Email,
@@ -31,9 +36,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  User? user;
 
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -184,24 +192,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: 380,
                       child: TextButton(
-                          onPressed: () async {
+                          onPressed: () {
                             setState(() {
                               isLoading = true;
                             });
                             AuthentificationUser authUser =
                                 AuthentificationUser();
-                            bool isAuthenticated =
-                                await authUser.authentification(
-                                    emailController.text,
-                                    passwordController.text);
 
-                            if (isAuthenticated) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Homee()),
-                              );
-                            }
+                            authUser.authentification(
+                              emailController.text,
+                              passwordController.text,
+                              context,
+                              providerUser,
+                            );
+
                             setState(() {
                               isLoading = false;
                             });
@@ -230,8 +234,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           if (isLoading) // Show spinner if isLoading is true
             const SpinKitFadingFour(
-              duration: const Duration(seconds: 5),
-              color: const Color.fromRGBO(8, 65, 142, 1),
+              duration: Duration(seconds: 5),
+              color: Color.fromRGBO(8, 65, 142, 1),
               size: 60.0, // Customize spinner size
             ),
         ],

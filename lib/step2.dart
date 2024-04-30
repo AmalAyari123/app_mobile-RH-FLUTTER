@@ -40,7 +40,7 @@ class _StepTwoState extends State<StepTwo> {
           const SizedBox(height: 40),
           const Center(
             child: Text(
-              'Demandez des autorisations',
+              'Demander des autorisations',
               style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
@@ -104,7 +104,7 @@ class _StepTwoState extends State<StepTwo> {
                   "Skip",
                   style: TextStyle(
                     fontFamily: 'Lato',
-                    color: const Color.fromRGBO(8, 65, 142, 1),
+                    color: Color.fromRGBO(8, 65, 142, 1),
                     letterSpacing: 0.5,
                     fontSize: 18.0,
                     fontWeight: FontWeight.w300,

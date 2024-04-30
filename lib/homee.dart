@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:lottie/lottie.dart';
+import 'package:myapp/Controller/demandeController.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Model/demande.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
 import 'package:myapp/notif.dart';
@@ -8,6 +12,7 @@ import 'package:myapp/utils.dart';
 import 'package:myapp/widgets/drawer.dart';
 import 'package:myapp/solde.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 class Homee extends StatefulWidget {
   const Homee({super.key});
@@ -23,6 +28,11 @@ class _HomeeState extends State<Homee> {
 
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+    getDemandeController(providerUser);
+
+    getDemandebyDepartementController(providerUser);
+    User? currentUser = providerUser.currentUser;
     return Scaffold(
       appBar: AppBar(
         elevation: 6,
@@ -60,62 +70,78 @@ class _HomeeState extends State<Homee> {
             ),
           ],
         ),
-      ),
-      key: _scaffoldKey,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-        selectedItemColor: const Color.fromRGBO(8, 65, 142, 1),
-        unselectedItemColor: Colors.grey[500],
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined, size: 30),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add_circle,
-              size: 40,
-              color: Color.fromRGBO(8, 65, 142, 1),
-            ),
-            label: 'Congés',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.history,
-              size: 30,
-            ),
-            label: 'Historique',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return const Notif();
+              }));
+            },
           ),
         ],
-        onTap: (index) {
-          // Handle navigation based on the selected index
-          setState(() {
-            _currentIndex = index;
-          });
+      ),
+      key: _scaffoldKey,
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey, width: 0.3),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: const Color.fromRGBO(8, 65, 142, 1),
+          unselectedItemColor: Colors.grey[500],
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined, size: 30),
+              label: 'Accueil',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.add_circle,
+                size: 40,
+                color: Color.fromRGBO(8, 65, 142, 1),
+              ),
+              label: 'Congés',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.history,
+                size: 30,
+              ),
+              label: 'Historique',
+            ),
+          ],
+          onTap: (index) {
+            // Handle navigation based on the selected index
+            setState(() {
+              _currentIndex = index;
+            });
 
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Homee()),
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Absencee()),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Historique()),
-            );
-          }
-        },
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Homee()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Absencee()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Historique()),
+              );
+            }
+          },
+        ),
       ),
       body: Container(
           height: MediaQuery.of(context).size.height - 170,
-          margin: const EdgeInsets.only(top: 20),
+          margin: const EdgeInsets.only(top: 10),
           child: ListView(
             padding: const EdgeInsets.all(14),
             children: [
@@ -132,7 +158,7 @@ class _HomeeState extends State<Homee> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Amal Ayari!',
+                    '${currentUser!.name!}!',
                     style: SafeGoogleFont(
                       'Roboto',
                       fontSize: 26,
@@ -142,24 +168,11 @@ class _HomeeState extends State<Homee> {
                   ),
                 ]),
                 const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.notifications,
-                      size: 35, color: Color.fromARGB(255, 178, 180, 182)),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return const Notif();
-                    }));
-
-                    // Add your notification icon onPressed logic here
-                  },
-                )
               ]),
-              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(10),
                 width: 50.0,
-                height: 150.0,
+                height: 120.0,
                 decoration: const BoxDecoration(
                   color: Color.fromARGB(255, 255, 253, 253),
                 ),
@@ -225,7 +238,7 @@ class _HomeeState extends State<Homee> {
                         ),
                         const SizedBox(height: 26)
                       ])),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Card(
                 color: Colors.white,
                 elevation: 0.5,
@@ -251,7 +264,7 @@ class _HomeeState extends State<Homee> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
                       Row(
                         children: [
                           CircularPercentIndicator(
@@ -274,7 +287,7 @@ class _HomeeState extends State<Homee> {
                           ),
                           const SizedBox(width: 27),
                           Text(
-                            "11 jours valables\n jusqu'à 31-12-2024",
+                            "${currentUser!.solde1! + currentUser!.soldeConge!} jours valables\n jusqu'à 31-12-2024",
                             style: SafeGoogleFont(
                               'Lato',
                               fontSize: 18,
@@ -284,10 +297,9 @@ class _HomeeState extends State<Homee> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
                     ]),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               Card(
                 color: Colors.white,
                 elevation: 0.5,

@@ -1,0 +1,97 @@
+BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:W. Central Africa Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T000000
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0100
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T000000
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0100
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER;CN=Asma Haamdi:mailto:asma.haamdi@tui.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=Mehdi Ben 
+ Hadj Kalboussi:mailto:meh.benhadjkalboussi@tui.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=miriamme91
+ @gmail.com:mailto:miriamme91@gmail.com
+DESCRIPTION;LANGUAGE=en-US:Dear Meriem\,\n\n\n\nThank you very much for you
+ r interest in joining TUI.\n\nWe are delighted to invite you to a virtual 
+ interview on 4/22/2024 at 1:30pm Tunisia Time with me from HR team and Meh
+ di Ben Hadj Kalboussi P2P OH Team Leader.\n\nPlease note that the intervie
+ w will last 45 minutes and you will need to ensure that you are in a quiet
+  environment and have access to a laptop or a smartphone with a stable mob
+ ile connection and a camera. To access the meeting\, please click on the l
+ ink below at the time of the interview.\n\n\n\nDuring the interview we wil
+ l lead you through some questions regarding your professional background a
+ nd explore your motivations to apply to this position.\n\nPlease confirm t
+ he receipt of this invitation and your attendance at your earliest conveni
+ ence. In case you are unable to attend\, please email us back with alterna
+ tive options and we will get back to you promptly.\n\nIf you have any ques
+ tions or issues before or on the day of the interview\, please do not hesi
+ tate to contact us. We look forward to hearing back from you!\nBest Regard
+ s\nAsma Haamdi\nRECRUIT-LEARNING & DEVELOP MANAGER • Tunisia\n__________
+ ______________________________________________________________________\nMi
+ crosoft Teams Need help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US>\nJoin
+  the meeting now<https://teams.microsoft.com/l/meetup-join/19%3ameeting_NW
+ Q5MjdhY2YtZGIzZC00YTFhLWExNTAtODk3NDYyZTNkNTli%40thread.v2/0?context=%7b%2
+ 2Tid%22%3a%22e3e1f65b-b973-440d-b61c-bc895fc98e28%22%2c%22Oid%22%3a%2228f6
+ 1f64-4215-42b7-80f2-2472fe03e8b4%22%7d>\nMeeting ID: 337 895 474 685\nPass
+ code: 9LryAB\n________________________________\nFor organizers: Meeting op
+ tions<https://teams.microsoft.com/meetingOptions/?organizerId=28f61f64-421
+ 5-42b7-80f2-2472fe03e8b4&tenantId=e3e1f65b-b973-440d-b61c-bc895fc98e28&thr
+ eadId=19_meeting_NWQ5MjdhY2YtZGIzZC00YTFhLWExNTAtODk3NDYyZTNkNTli@thread.v
+ 2&messageId=0&language=en-US> | Reset dial-in PIN<https://dialin.teams.mic
+ rosoft.com/usp/pstnconferencing>\n________________________________________
+ ________________________________________\n\n
+UID:040000008200E00074C5B7101A82E0080000000050F03825E590DA01000000000000000
+ 01000000020C2811145A9BE4EA0E8FDD6061A6A06
+SUMMARY;LANGUAGE=en-US:Interview Meriem Brini / Purchase to Pay Executive -
+  TUI
+DTSTART;TZID=W. Central Africa Standard Time:20240422T133000
+DTEND;TZID=W. Central Africa Standard Time:20240422T141500
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20240417T153628Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION;LANGUAGE=en-US:Microsoft Teams Meeting
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-OWNERAPPTID:1821460456
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_NWQ5MjdhY2YtZGIzZC00YTFhLWExNTAtODk3NDYyZTNkNTli%40thread.v2/
+ 0?context=%7b%22Tid%22%3a%22e3e1f65b-b973-440d-b61c-bc895fc98e28%22%2c%22O
+ id%22%3a%2228f61f64-4215-42b7-80f2-2472fe03e8b4%22%7d
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/e3e1f65b-b973-440d-b61c-bc895fc98e28/28f61f64-4215-42b7-80f2-2
+ 472fe03e8b4/19_meeting_NWQ5MjdhY2YtZGIzZC00YTFhLWExNTAtODk3NDYyZTNkNTli@th
+ read.v2/0
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_NWQ5MjdhY2YtZGIzZC00YTF
+ hLWExNTAtODk3NDYyZTNkNTli@thread.v2"\,"private":true\,"type":0\,"mid":0\,"
+ rid":0\,"uid":null}
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Loca
+ tionUri" : "" } ]
+BEGIN:VALARM
+DESCRIPTION:REMINDER
+TRIGGER;RELATED=START:-PT15M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR

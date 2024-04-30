@@ -1,10 +1,13 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
+import 'package:provider/provider.dart';
 
 class solde extends StatefulWidget {
   const solde({super.key});
@@ -18,6 +21,8 @@ class _soldeState extends State<solde> {
 
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+    User? currentUser = providerUser.currentUser;
     return Scaffold(
         appBar: AppBar(
             elevation: 9,
@@ -46,16 +51,17 @@ class _soldeState extends State<solde> {
                 ),
               ],
             ),
-            bottom: const PreferredSize(
-                preferredSize: Size.fromHeight(10),
+            bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(10),
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 60, left: 10, right: 10),
+                  padding:
+                      const EdgeInsets.only(bottom: 60, left: 10, right: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
                         children: [
-                          Text(
+                          const Text(
                             'Solde 2023',
                             style: TextStyle(
                                 fontFamily: 'Lato',
@@ -63,21 +69,21 @@ class _soldeState extends State<solde> {
                                 fontSize: 20,
                                 color: Color.fromARGB(255, 249, 249, 249)),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            '3 jours',
-                            style: TextStyle(
+                            '${currentUser!.solde1!}',
+                            style: const TextStyle(
                                 fontFamily: 'Lato',
                                 fontWeight: FontWeight.w500,
-                                fontSize: 20,
+                                fontSize: 22,
                                 color: Color.fromARGB(255, 205, 203, 203)),
                           ),
                         ],
                       ),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Column(
                         children: [
-                          Text(
+                          const Text(
                             'Solde 2024',
                             style: TextStyle(
                                 fontFamily: 'Lato',
@@ -85,10 +91,10 @@ class _soldeState extends State<solde> {
                                 fontSize: 20,
                                 color: Color.fromARGB(255, 249, 249, 249)),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
-                            '18 jours',
-                            style: TextStyle(
+                            '${currentUser!.soldeConge!}',
+                            style: const TextStyle(
                                 fontFamily: 'Lato',
                                 fontWeight: FontWeight.w500,
                                 fontSize: 20,
@@ -96,10 +102,10 @@ class _soldeState extends State<solde> {
                           ),
                         ],
                       ),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Column(
                         children: [
-                          Text(
+                          const Text(
                             'Total',
                             style: TextStyle(
                                 fontFamily: 'Lato',
@@ -107,10 +113,10 @@ class _soldeState extends State<solde> {
                                 fontSize: 24,
                                 color: Color.fromARGB(255, 255, 255, 255)),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
-                            '21 jours',
-                            style: TextStyle(
+                            '${currentUser!.solde1! + currentUser!.soldeConge!}',
+                            style: const TextStyle(
                                 fontFamily: 'Lato',
                                 fontWeight: FontWeight.w500,
                                 fontSize: 20,

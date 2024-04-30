@@ -3,11 +3,18 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/demandeController.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
+import 'package:myapp/Model/demande.dart';
+import 'package:myapp/Model/user.dart';
 
 import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
 import 'package:myapp/formulaire.dart';
+import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Absencee extends StatefulWidget {
@@ -26,7 +33,7 @@ class _AbsenceeState extends State<Absencee> {
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
 
-  int rangeCount = 0;
+  double rangeCount = 0;
 
   @override
   void initState() {
@@ -72,10 +79,10 @@ class _AbsenceeState extends State<Absencee> {
     }
   }
 
-  int calculateRangeCount() {
+  double calculateRangeCount() {
     if (_rangeStart != null && _rangeEnd != null) {
       DateTime currentDate = _rangeStart!;
-      int count = 0;
+      double count = 0;
 
       while (currentDate.isBefore(_rangeEnd!) ||
           currentDate.isAtSameMomentAs(_rangeEnd!)) {
@@ -92,7 +99,7 @@ class _AbsenceeState extends State<Absencee> {
       return count;
     } else {
       // Single day selected
-      return 1;
+      return 1.0;
     }
   }
 
@@ -107,65 +114,94 @@ class _AbsenceeState extends State<Absencee> {
 
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+
+    List<Demande>? demandesD = providerUser.demandesD;
+    getDemandebyDepartementController(providerUser);
+    List<User>? users = providerUser.employes;
+    getUsersController(providerUser);
+    User? currentUser = providerUser.currentUser;
+    DemandDataSource _dataSource =
+        DemandDataSource(demandesD, users, currentUser);
+    /*setState(() {
+      _dataSource = DemandDataSource(demandes, users);
+    });*/
+
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-              selectedItemColor: const Color.fromRGBO(8, 65, 142, 1),
-              unselectedItemColor: Colors.grey[500],
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined, size: 30),
-                  label: 'Accueil',
+            bottomNavigationBar: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.grey, width: 0.3),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.add_circle,
-                    size: 40,
-                    color: Color.fromRGBO(8, 65, 142, 1),
+              ),
+              child: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                type: BottomNavigationBarType.fixed,
+                selectedItemColor: const Color.fromRGBO(8, 65, 142, 1),
+                unselectedItemColor: Colors.grey[500],
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined, size: 30),
+                    label: 'Accueil',
                   ),
-                  label: 'Congés',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.history,
-                    size: 30,
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.add_circle,
+                      size: 40,
+                      color: Color.fromRGBO(8, 65, 142, 1),
+                    ),
+                    label: 'Congés',
                   ),
-                  label: 'Historique',
-                ),
-              ],
-              onTap: (index) {
-                // Handle navigation based on the selected index
-                setState(() {
-                  _currentIndex = index;
-                });
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.history,
+                      size: 30,
+                    ),
+                    label: 'Historique',
+                  ),
+                ],
+                onTap: (index) {
+                  // Handle navigation based on the selected index
+                  setState(() {
+                    _currentIndex = index;
+                  });
 
-                if (index == 0) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Homee()),
-                  );
-                } else if (index == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Absencee()),
-                  );
-                } else if (index == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Historique()),
-                  );
-                }
-              },
+                  if (index == 0) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Homee()),
+                    );
+                  } else if (index == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Absencee()),
+                    );
+                  } else if (index == 2) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Historique()),
+                    );
+                  }
+                },
+              ),
             ),
             appBar: AppBar(
               elevation: 6,
               shadowColor: Colors.grey,
               automaticallyImplyLeading: false,
               backgroundColor: const Color.fromRGBO(8, 65, 142, 1),
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                    size: 20,
+                  )),
               centerTitle: true,
               title: Text(
                 "Demande d'absence",
@@ -208,7 +244,7 @@ class _AbsenceeState extends State<Absencee> {
               ),
               Container(
                 height: MediaQuery.of(context).size.height - 250,
-                margin: const EdgeInsets.only(top: 30),
+                margin: const EdgeInsets.only(top: 10),
                 child: TabBarView(
                   children: [
                     SingleChildScrollView(
@@ -328,10 +364,79 @@ class _AbsenceeState extends State<Absencee> {
                         ],
                       ),
                     ),
-                    const Text("aa"),
+                    SfCalendar(
+                      view: CalendarView.month,
+                      firstDayOfWeek: 1,
+                      allowViewNavigation: false,
+                      cellBorderColor: Colors.transparent,
+                      monthViewSettings: const MonthViewSettings(
+                        appointmentDisplayMode:
+                            MonthAppointmentDisplayMode.appointment,
+                        // Increase the appointment display count
+                        numberOfWeeksInView: 3,
+                        // Increase the number of weeks in view
+                        agendaViewHeight: 200,
+                        monthCellStyle: MonthCellStyle(
+                          textStyle: TextStyle(fontSize: 12),
+                          leadingDatesTextStyle: TextStyle(fontSize: 14),
+
+                          // Increase the width of the month cells
+                        ),
+                      ),
+                      dataSource: _dataSource,
+                      headerHeight: 60,
+                      headerStyle: const CalendarHeaderStyle(
+                          textStyle:
+                              TextStyle(fontSize: 23, fontFamily: 'Lato'),
+                          backgroundColor: Colors.white),
+                      appointmentBuilder: (BuildContext context,
+                          CalendarAppointmentDetails details) {
+                        String notes = details.appointments.first.notes;
+
+                        return Container(
+                          color: details.appointments.first.color,
+                          child: Center(
+                            child: Text(notes,
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 99, 98, 98),
+                                    fontSize: 12)),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
             ])));
+  }
+}
+
+class DemandDataSource extends CalendarDataSource {
+  @override
+  final List<Appointment> appointments;
+
+  DemandDataSource(
+      List<Demande>? demandes, List<User>? users, User? currentUser)
+      : appointments = [] {
+    if (demandes != null && users != null && currentUser != null) {
+      for (var demande in demandes) {
+        // Check if the demande's user ID is not the same as the current user's ID
+        if (demande.userId != currentUser.id) {
+          User? user = users.firstWhere(
+            (user) => user.id == demande.userId,
+            orElse: () => User(id: -1, name: 'Unknown'),
+          );
+
+          Appointment appointment = Appointment(
+            color: const Color.fromARGB(255, 247, 239, 1),
+            startTime: demande.dateDebut!,
+            endTime: demande.dateFin!,
+            notes: user!.name ?? 'Unknown',
+          );
+
+          appointments.add(appointment);
+        }
+      }
+    }
   }
 }

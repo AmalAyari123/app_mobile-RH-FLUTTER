@@ -16,10 +16,7 @@ class TacheGrid extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+              tache[index].customFunction(context);
             },
             child: Container(
                 decoration: BoxDecoration(
@@ -28,9 +25,9 @@ class TacheGrid extends StatelessWidget {
                       fit: BoxFit.fill),
                 ),
                 child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,16 +35,16 @@ class TacheGrid extends StatelessWidget {
                               children: [
                                 Text(
                                   tache[index].text,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  tache[index].lessons,
-                                  style: const TextStyle(color: Colors.white),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontFamily: 'Lato'),
                                 ),
                               ]),
                           Image.asset(
                             tache[index].imageUrl,
-                            height: 110,
+                            height: 300,
+                            width: 119,
                           )
                         ]))),
           );

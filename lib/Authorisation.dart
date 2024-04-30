@@ -1,11 +1,16 @@
 // ignore_for_file: file_names, non_constant_identifier_names, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/autorisationController.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Model/autorisation.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class Authorisation extends StatefulWidget {
   const Authorisation({super.key});
@@ -45,59 +50,76 @@ class _AuthorisationState extends State<Authorisation> {
 
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+    User? currentUser = providerUser.currentUser;
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-        selectedItemColor: Colors.grey[500],
-        unselectedItemColor: Colors.grey[500],
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined, size: 30),
-            label: 'Accueil',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey, width: 0.3),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add_circle,
-              size: 40,
-              color: Color.fromRGBO(8, 65, 142, 1),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.grey[500],
+          unselectedItemColor: Colors.grey[500],
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined, size: 30),
+              label: 'Accueil',
             ),
-            label: 'Congés',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.history,
-              size: 30,
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.add_circle,
+                size: 40,
+                color: Color.fromRGBO(8, 65, 142, 1),
+              ),
+              label: 'Congés',
             ),
-            label: 'Historique',
-          ),
-        ],
-        onTap: (index) {
-          // Handle navigation based on the selected index
-          setState(() {
-            _currentIndex = index;
-          });
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.history,
+                size: 30,
+              ),
+              label: 'Historique',
+            ),
+          ],
+          onTap: (index) {
+            // Handle navigation based on the selected index
+            setState(() {
+              _currentIndex = index;
+            });
 
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Homee()),
-            );
-          } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Absencee()),
-            );
-          } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Historique()),
-            );
-          }
-        },
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Homee()),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Absencee()),
+              );
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Historique()),
+              );
+            }
+          },
+        ),
       ),
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 20,
+            )),
         elevation: 6,
         shadowColor: Colors.grey,
         automaticallyImplyLeading: false,
@@ -356,11 +378,44 @@ class _AuthorisationState extends State<Authorisation> {
                     padding: const EdgeInsets.only(left: 30, right: 30),
                     child: TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Homee()),
+                          DateTime heureDebut = DateTime(
+                            dateTime.year, // Use the same year as dateTime
+                            dateTime.month, // Use the same month as dateTime
+                            dateTime.day, // Use the same day as dateTime
+                            _timeOfDay.hour, // Set the hour from TimeOfDay
+                            _timeOfDay.minute, // Set the minute from TimeOfDay
                           );
+
+// Convert TimeOfDay to DateTime for heureFin
+
+                          // Create a new Autorisation object with the selected values
+                          Autorisation newAut = Autorisation(
+                            heureDebut: DateTime(
+                              dateTime.year, // Use the same year as dateTime
+                              dateTime.month, // Use the same month as dateTime
+                              dateTime.day, // Use the same day as dateTime
+                              _timeOfDay.hour, // Set the hour from TimeOfDay
+                              _timeOfDay
+                                  .minute, // Set the minute from TimeOfDay
+                            ),
+                            heureFin: DateTime(
+                              dateTime.year, // Use the same year as dateTime
+                              dateTime.month, // Use the same month as dateTime
+                              dateTime.day, // Use the same day as dateTime
+                              _timeOfDay2.hour, // Set the hour from TimeOfDay
+                              _timeOfDay2
+                                  .minute, // Set the minute from TimeOfDay
+                            ),
+                            jour: DateTime(
+                              dateTime.year,
+                              dateTime.month,
+                              dateTime.day,
+                            ),
+                            // Assign the DateTime object directly
+                            // Set the status as needed
+                          );
+                          createAutorisationController(
+                              context, newAut, providerUser);
                         },
                         style: TextButton.styleFrom(
                             backgroundColor:

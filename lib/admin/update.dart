@@ -1,101 +1,79 @@
-import 'dart:convert';
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
+import 'package:myapp/Model/departement.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/utils.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:supercharged/supercharged.dart';
 
 class Update extends StatefulWidget {
-  final int? id;
-  final String? name;
-  final String? email;
-  final int? soldeconge;
-  final int? solde1;
-  final int? numtel;
-  final String? company;
-  final String? photopath;
+  final User? user;
+  final int? index;
+  final ProviderUser? providerUser;
 
   const Update(
       {super.key,
-      required this.id,
-      required this.name,
-      required this.email,
-      required this.soldeconge,
-      required this.solde1,
-      required this.numtel,
-      required this.company,
-      required this.photopath});
+      required this.user,
+      required this.index,
+      required this.providerUser});
 
   @override
   State<Update> createState() => _UpdateState();
 }
 
 class _UpdateState extends State<Update> {
-  late TextEditingController nameController;
-  late TextEditingController emailController;
-  late TextEditingController soldeCongeController;
-  late TextEditingController soldeCongePreviousController;
-  late TextEditingController departmentController;
-  late TextEditingController numtelController;
-  late TextEditingController companyController;
-  late TextEditingController roleController;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController soldeCongeController = TextEditingController();
+  TextEditingController soldeCongePreviousController = TextEditingController();
+  TextEditingController departmentController = TextEditingController();
+  TextEditingController numtelController = TextEditingController();
+  TextEditingController companyController = TextEditingController();
+  TextEditingController roleController = TextEditingController();
+  Departement? selectedDepartement;
+  String? selectedRole;
+
+  final List<String> roleItems = [
+    'Employé',
+    'Chef département',
+    'Team Leader',
+    'Responsable RH'
+  ];
+  String? selectedValue;
 
   @override
   void initState() {
     super.initState();
     // Initialize controllers with initial values
-    nameController = TextEditingController(text: widget.name);
-    emailController = TextEditingController(text: widget.email);
+    nameController = TextEditingController(text: widget.user!.name);
+    emailController = TextEditingController(text: widget.user!.email);
     soldeCongeController =
-        TextEditingController(text: widget.soldeconge.toString());
+        TextEditingController(text: widget.user!.soldeConge.toString());
     soldeCongePreviousController =
-        TextEditingController(text: (widget.soldeconge! - 1).toString());
+        TextEditingController(text: widget.user!.solde1.toString());
     departmentController = TextEditingController();
-    numtelController = TextEditingController(text: widget.numtel.toString());
-    companyController = TextEditingController(text: widget.company);
+    numtelController =
+        TextEditingController(text: widget.user!.numTel.toString());
+    companyController = TextEditingController(text: widget.user!.companyGroup);
     roleController = TextEditingController();
   }
 
   @override
-  void dispose() {
-    // Dispose controllers when they are no longer needed
-    nameController.dispose();
-    emailController.dispose();
-    soldeCongeController.dispose();
-    soldeCongePreviousController.dispose();
-    departmentController.dispose();
-    numtelController.dispose();
-    companyController.dispose();
-    roleController.dispose();
-    super.dispose();
-  }
-
-  Future<void> updateName() async {
-    final updatedName = nameController.text;
-    // Call API to update name
-    try {
-      final response = await http.patch(
-        Uri.parse('http://192.168.1.200:3000/users/name/${widget.id}'),
-        body: jsonEncode({'name': updatedName}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        /*   setState(() {
-        widget.name = updatedName; 
-      });*/
-        print('Name updated successfully');
-      } else {
-        print('Failed to update name');
-      }
-    } catch (error) {
-      print('Error updating name: $error');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+    List<User>? users = providerUser.employes;
+    ProviderDepartement providerDepartement =
+        context.watch<ProviderDepartement>();
+
+    List<Departement>? departements = providerDepartement.departements;
     DateTime now = DateTime.now();
 
     int currentYear = now.year;
+    User? user = widget.user;
 
     return Scaffold(
         appBar: AppBar(
@@ -103,79 +81,77 @@ class _UpdateState extends State<Update> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: ListView(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            children: [
-              Container(
-                  width: 130,
-                  height: 130,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 4, color: Colors.white),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 201, 198, 198)
-                              .withOpacity(0.6),
-                          spreadRadius: 2,
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                      image: DecorationImage(
-                          image: NetworkImage(widget.photopath ?? '')))),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: nameController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Nom et prénom",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
+        body: ListView(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          children: [
+            Container(
+                width: 130,
+                height: 130,
+                decoration: BoxDecoration(
+                    border: Border.all(width: 4, color: Colors.white),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 201, 198, 198)
+                            .withOpacity(0.6),
+                        spreadRadius: 2,
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
                       ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(
-                height: 20,
-              ),
-              TextField(
-                  controller: emailController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
+                    ],
+                    image: DecorationImage(
+                        image: NetworkImage(widget.user!.profilePic ?? '')))),
+            const SizedBox(height: 20),
+            TextField(
+                controller: nameController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(width: 1, color: Colors.grey),
                   ),
-                  decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  label: Text(
+                    "Nom et prénom",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  contentPadding:
+                      const EdgeInsets.only(top: 10, bottom: 10, left: 8),
+                )),
+            const SizedBox(
+              height: 20,
+            ),
+            TextField(
+                controller: emailController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color.fromARGB(255, 255, 255, 255),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
+                          const BorderSide(width: 1, color: Colors.grey),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -191,23 +167,24 @@ class _UpdateState extends State<Update> {
                       ),
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: soldeCongeController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  decoration: InputDecoration(
+                    contentPadding:
+                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
+            const SizedBox(height: 20),
+            TextField(
+                controller: soldeCongeController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color.fromARGB(255, 255, 255, 255),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
+                          const BorderSide(width: 1, color: Colors.grey),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -223,23 +200,24 @@ class _UpdateState extends State<Update> {
                       ),
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: soldeCongePreviousController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  decoration: InputDecoration(
+                    contentPadding:
+                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
+            const SizedBox(height: 20),
+            TextField(
+                controller: soldeCongePreviousController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color.fromARGB(255, 255, 255, 255),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5),
                       borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
+                          const BorderSide(width: 1, color: Colors.grey),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -255,162 +233,244 @@ class _UpdateState extends State<Update> {
                       ),
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(
-                height: 20,
+                    contentPadding:
+                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
+            const SizedBox(height: 20),
+            DropdownButtonFormField2<String>(
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(vertical: 13),
+                border: OutlineInputBorder(
+                  borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 192, 187, 187)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
-              TextField(
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Département",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: numtelController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Numero tel",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(
-                height: 20,
+              value: departements?.isNotEmpty ?? false
+                  ? departements!.first.name
+                  : null, // Set default value
+              items: departements!
+                  .map((item) => DropdownMenuItem<String>(
+                        value: item.name,
+                        child: Text(
+                          item.name ?? '',
+                          style: SafeGoogleFont(
+                            'Rubik',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300,
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ))
+                  .toList(),
+
+              onChanged: (value) {
+                selectedDepartement = departements!.firstWhere(
+                  (department) => department.name == value,
+                );
+                print(selectedDepartement);
+              },
+              onSaved: (value) {
+                selectedValue = value.toString();
+              },
+              buttonStyleData: const ButtonStyleData(
+                padding: EdgeInsets.only(right: 8),
               ),
-              TextField(
-                  controller: companyController,
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
+              iconStyleData: const IconStyleData(
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black45,
+                ),
+                iconSize: 24,
+              ),
+              dropdownStyleData: DropdownStyleData(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              menuItemStyleData: const MenuItemStyleData(
+                padding: EdgeInsets.symmetric(horizontal: 13),
+              ),
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField2<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(vertical: 13),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              value: roleItems.isNotEmpty
+                  ? roleItems.first
+                  : null, // Set default value
+              items: roleItems
+                  .map((item) => DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(
+                          item,
+                          style: SafeGoogleFont(
+                            'Rubik',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300,
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ))
+                  .toList(),
+
+              onChanged: (value) {
+                selectedRole = value; // Update the selectedRole variable
+
+                print(selectedRole); // Print selected role for debugging
+              },
+
+              onSaved: (value) {
+                selectedValue = value.toString();
+              },
+              buttonStyleData: const ButtonStyleData(
+                padding: EdgeInsets.only(right: 8),
+              ),
+              iconStyleData: const IconStyleData(
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black45,
+                ),
+                iconSize: 24,
+              ),
+              dropdownStyleData: DropdownStyleData(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              menuItemStyleData: const MenuItemStyleData(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+                controller: numtelController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(width: 1, color: Colors.grey),
                   ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Company Group",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(height: 20),
-              TextField(
-                  style: SafeGoogleFont(
-                    'Rubik',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 0, 0, 0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.grey),
                   ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.grey),
+                  label: Text(
+                    "Numero tel",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Role",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                  )),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    primary: const Color(0xff2da9ef),
                   ),
-                  onPressed: () async {
-                    await updateName();
-                    Navigator.of(context).pop(); // Call the updateName method
-                  },
-                  child: const Text(
-                    'Enregistrer',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  contentPadding:
+                      const EdgeInsets.only(top: 10, bottom: 10, left: 8),
+                )),
+            const SizedBox(
+              height: 20,
+            ),
+            TextField(
+                controller: companyController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: const BorderSide(width: 1, color: Colors.grey),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  label: Text(
+                    "Company Group",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
                     ),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  contentPadding:
+                      const EdgeInsets.only(top: 10, bottom: 10, left: 8),
+                )),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  backgroundColor: const Color(0xff2da9ef),
+                ),
+                onPressed: () async {
+                  user!.name = nameController.text.toString();
+                  user.email = emailController.text.toString();
+
+                  user.userrole =
+                      selectedRole != null ? selectedRole : roleItems.first;
+                  if (soldeCongeController.text.isNotEmpty) {
+                    user.soldeConge = soldeCongeController.text.toDouble();
+                  } else {
+                    user.soldeConge = 0;
+                  }
+                  if (soldeCongePreviousController.text.isNotEmpty) {
+                    user.solde1 = soldeCongePreviousController.text.toDouble();
+                  } else {
+                    user.solde1 = 0;
+                  }
+                  try {
+                    user.numTel = numtelController.text.isNotEmpty
+                        ? int.parse(numtelController.text)
+                        : null;
+                  } catch (e) {
+                    print('Invalid input for numTel: ${numtelController.text}');
+                    user.numTel = null;
+                  }
+                  user.companyGroup = companyController.text.toString();
+                  user.DepartmentId = selectedDepartement != null
+                      ? selectedDepartement!.id
+                      : departements!.first.id;
+                  // ignore: prefer_if_null_operators
+                  user.departement = selectedDepartement != null
+                      ? selectedDepartement
+                      : departements.first;
+
+                  updateUserController(
+                      context, user, widget.index!, widget.providerUser!);
+                },
+                child: const Text(
+                  'Enregistrer',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ));
   }
 }

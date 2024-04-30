@@ -18,58 +18,73 @@ class _NotifState extends State<Notif> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-          selectedItemColor: Colors.grey[500],
-          unselectedItemColor: Colors.grey[500],
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined, size: 30),
-              label: 'Accueil',
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.grey, width: 0.3),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.add_circle,
-                size: 40,
-                color: Color.fromRGBO(8, 65, 142, 1),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Colors.grey[500],
+            unselectedItemColor: Colors.grey[500],
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined, size: 30),
+                label: 'Accueil',
               ),
-              label: 'Congés',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.history,
-                size: 30,
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.add_circle,
+                  size: 40,
+                  color: Color.fromRGBO(8, 65, 142, 1),
+                ),
+                label: 'Congés',
               ),
-              label: 'Historique',
-            ),
-          ],
-          onTap: (index) {
-            // Handle navigation based on the selected index
-            setState(() {
-              _currentIndex = index;
-            });
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.history,
+                  size: 30,
+                ),
+                label: 'Historique',
+              ),
+            ],
+            onTap: (index) {
+              // Handle navigation based on the selected index
+              setState(() {
+                _currentIndex = index;
+              });
 
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Homee()),
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Absencee()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Historique()),
-              );
-            }
-          },
+              if (index == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Homee()),
+                );
+              } else if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Absencee()),
+                );
+              } else if (index == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Historique()),
+                );
+              }
+            },
+          ),
         ),
         appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20,
+              )),
           elevation: 6,
           shadowColor: Colors.grey,
           automaticallyImplyLeading: false,

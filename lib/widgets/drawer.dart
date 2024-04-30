@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
+import 'package:myapp/Model/user.dart';
 import 'package:myapp/profile.dart';
 import 'package:myapp/utils.dart';
 import 'package:myapp/Authorisation.dart';
+import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -14,6 +18,10 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
+    ProviderUser providerUser = context.watch<ProviderUser>();
+    User? currentUser = providerUser.currentUser;
+
+    getUsersController(providerUser);
     return Drawer(
       child: Container(
         decoration: const BoxDecoration(
@@ -59,7 +67,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               onTap: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
-                  return const UpdateProfile();
+                  return UpdateProfile(currentuser: currentUser!);
                 }));
               },
               child: Text(
@@ -130,8 +138,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
             onTap: () {
-              // Handle home item tap
-              Navigator.pop(context); // Close the drawer
+              logout(context, providerUser); // Close the drawer
             },
           ),
         ]),

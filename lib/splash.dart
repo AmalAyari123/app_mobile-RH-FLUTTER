@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:myapp/step1.dart';
-import 'package:provider/provider.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});

@@ -20,18 +20,18 @@ class _StepFourState extends State<StepFour> {
             height: 300,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: DecorationImage(
+              image: const DecorationImage(
                 image: AssetImage(
                     'assets/page-1/images/history.jpg'), // Replace this with your image path
                 fit: BoxFit.cover,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color.fromARGB(255, 147, 147, 147)
+                  color: const Color.fromARGB(255, 147, 147, 147)
                       .withOpacity(0.5), // Shadow color
                   spreadRadius: 2, // Spread radius
                   blurRadius: 7, // Blur radius
-                  offset: Offset(0, 3), // Offset
+                  offset: const Offset(0, 3), // Offset
                 ),
               ],
             ),
@@ -64,7 +64,8 @@ class _StepFourState extends State<StepFour> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -90,7 +91,8 @@ class _StepFourState extends State<StepFour> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -102,7 +104,7 @@ class _StepFourState extends State<StepFour> {
                   "Skip",
                   style: TextStyle(
                     fontFamily: 'Lato',
-                    color: const Color.fromRGBO(8, 65, 142, 1),
+                    color: Color.fromRGBO(8, 65, 142, 1),
                     letterSpacing: 0.5,
                     fontSize: 18.0,
                     fontWeight: FontWeight.w300,

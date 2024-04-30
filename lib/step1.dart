@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/homee.dart';
 import 'package:myapp/logiin.dart';
 import 'package:myapp/step2.dart';
 
@@ -22,18 +21,18 @@ class _StepOneState extends State<StepOne> {
             height: 300,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: DecorationImage(
+              image: const DecorationImage(
                 image: AssetImage(
                     'assets/page-1/images/congés.jpg'), // Replace this with your image path
                 fit: BoxFit.cover,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color.fromARGB(255, 147, 147, 147)
+                  color: const Color.fromARGB(255, 147, 147, 147)
                       .withOpacity(0.5), // Shadow color
                   spreadRadius: 2, // Spread radius
                   blurRadius: 7, // Blur radius
-                  offset: Offset(0, 3), // Offset
+                  offset: const Offset(0, 3), // Offset
                 ),
               ],
             ),
@@ -41,7 +40,7 @@ class _StepOneState extends State<StepOne> {
           const SizedBox(height: 40),
           const Center(
             child: Text(
-              'Demandez des congés',
+              'Demander des congés',
               style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
@@ -66,7 +65,7 @@ class _StepOneState extends State<StepOne> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => StepTwo()),
+                    MaterialPageRoute(builder: (context) => const StepTwo()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -92,7 +91,8 @@ class _StepOneState extends State<StepOne> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -104,7 +104,7 @@ class _StepOneState extends State<StepOne> {
                   "Skip",
                   style: TextStyle(
                     fontFamily: 'Lato',
-                    color: const Color.fromRGBO(8, 65, 142, 1),
+                    color: Color.fromRGBO(8, 65, 142, 1),
                     letterSpacing: 0.5,
                     fontSize: 18.0,
                     fontWeight: FontWeight.w300,

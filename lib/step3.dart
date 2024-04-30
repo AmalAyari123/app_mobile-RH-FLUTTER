@@ -21,18 +21,18 @@ class _StepThreeState extends State<StepThree> {
             height: 300,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: DecorationImage(
+              image: const DecorationImage(
                 image: AssetImage(
                     'assets/page-1/images/teletravail.jpg'), // Replace this with your image path
                 fit: BoxFit.cover,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color.fromARGB(255, 147, 147, 147)
+                  color: const Color.fromARGB(255, 147, 147, 147)
                       .withOpacity(0.5), // Shadow color
                   spreadRadius: 2, // Spread radius
                   blurRadius: 7, // Blur radius
-                  offset: Offset(0, 3), // Offset
+                  offset: const Offset(0, 3), // Offset
                 ),
               ],
             ),
@@ -40,7 +40,7 @@ class _StepThreeState extends State<StepThree> {
           const SizedBox(height: 40),
           const Center(
             child: Text(
-              'Demandez des télétravails',
+              'Demander du télétravail',
               style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
@@ -65,7 +65,7 @@ class _StepThreeState extends State<StepThree> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => StepFour()),
+                    MaterialPageRoute(builder: (context) => const StepFour()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -91,7 +91,8 @@ class _StepThreeState extends State<StepThree> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 style: TextButton.styleFrom(
@@ -103,7 +104,7 @@ class _StepThreeState extends State<StepThree> {
                   "Skip",
                   style: TextStyle(
                     fontFamily: 'Lato',
-                    color: const Color.fromRGBO(8, 65, 142, 1),
+                    color: Color.fromRGBO(8, 65, 142, 1),
                     letterSpacing: 0.5,
                     fontSize: 18.0,
                     fontWeight: FontWeight.w300,
