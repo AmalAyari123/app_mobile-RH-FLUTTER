@@ -390,7 +390,7 @@ class _AuthorisationState extends State<Authorisation> {
 
                           // Create a new Autorisation object with the selected values
                           Autorisation newAut = Autorisation(
-                            heureDebut: DateTime(
+                            heureDebut: DateTime.utc(
                               dateTime.year, // Use the same year as dateTime
                               dateTime.month, // Use the same month as dateTime
                               dateTime.day, // Use the same day as dateTime
@@ -398,7 +398,7 @@ class _AuthorisationState extends State<Authorisation> {
                               _timeOfDay
                                   .minute, // Set the minute from TimeOfDay
                             ),
-                            heureFin: DateTime(
+                            heureFin: DateTime.utc(
                               dateTime.year, // Use the same year as dateTime
                               dateTime.month, // Use the same month as dateTime
                               dateTime.day, // Use the same day as dateTime

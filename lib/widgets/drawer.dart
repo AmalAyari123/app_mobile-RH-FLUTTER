@@ -3,6 +3,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/user.dart';
+import 'package:myapp/logiin.dart';
 import 'package:myapp/profile.dart';
 import 'package:myapp/utils.dart';
 import 'package:myapp/Authorisation.dart';
@@ -20,6 +21,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
     User? currentUser = providerUser.currentUser;
+    ProviderDepartement providerDepartement =
+        context.watch<ProviderDepartement>();
+    getDepartementsController(providerDepartement);
 
     getUsersController(providerUser);
     return Drawer(
@@ -138,7 +142,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
             onTap: () {
-              logout(context, providerUser); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              ); // Close the drawer
             },
           ),
         ]),

@@ -14,6 +14,9 @@ import 'dart:async';
 Future getDemandeController(
   ProviderUser providerUser,
 ) async {
+  if (providerUser.token == null) {
+    print('token is null');
+  }
   http.Response response = (await getDemande(providerUser.token!));
   List<Demande> demandes = [];
 
@@ -99,6 +102,11 @@ Future<http.Response> updateSoldee(User user, String token) async {
 
 Future createDemandeController(
     BuildContext context, Demande demande, ProviderUser providerUser) async {
+  if (providerUser.token == null) {
+    // Handle the case where providerUser.token is null
+    print('Token is null. Unable to create demande.');
+    return;
+  }
   final response = await createDemande(demande, providerUser.token!);
   List<Demande>? demandes = providerUser.demandes ?? [];
 
@@ -122,6 +130,7 @@ Future createDemandeController(
     );
     Navigator.of(context).pop();
   } else {
+    print(response.statusCode);
     // Failed to create user
     Get.snackbar(
       '', // Title
@@ -136,6 +145,31 @@ Future createDemandeController(
       duration: const Duration(seconds: 3), // Duration
       animationDuration:
           const Duration(milliseconds: 300), // Animation duration
+    );
+  }
+}
+
+Future deleteDemandeController(
+    BuildContext context, int id, int index, ProviderUser providerUser) async {
+  http.Response response = (await deleteDemande(id));
+  List<Demande>? demandes = providerUser.demandes;
+
+  if (response.statusCode == 200) {
+    demandes!.removeAt(index);
+    providerUser.setDemande(demandes);
+    Get.snackbar(
+      'Demande est annulée avec succès!',
+      '', // Message
+      backgroundColor: Colors.blue.shade700, // Background color
+      colorText: Colors.white, // Text color
+      snackPosition: SnackPosition.BOTTOM, // Position
+      borderRadius: 10, // Border radius
+      margin: const EdgeInsets.all(10), // Margin
+      padding:
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Padding
+      duration: const Duration(seconds: 5), // Duration
+      animationDuration:
+          const Duration(milliseconds: 400), // Animation duration
     );
   }
 }

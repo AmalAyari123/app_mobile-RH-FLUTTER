@@ -7,6 +7,7 @@ import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/autorisation.dart';
 import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
+import 'package:myapp/admin/detail-autorisation.dart';
 import 'package:myapp/admin/detail-demande.dart';
 import 'package:myapp/utils.dart';
 import 'package:provider/provider.dart';
@@ -112,14 +113,14 @@ class _AutorisationsState extends State<Autorisations> {
                           size: 18,
                         ),
                         onPressed: () {
-                          /*  Navigator.of(context)
+                          Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
-                            return DemandeDetails(
+                            return AutorisationDetails(
                               user: associatedUser!,
                               index: index,
-                              demande: demandes![index],
+                              autorisation: autorisations![index],
                             );
-                          }));*/
+                          }));
                         },
                       ),
                     );

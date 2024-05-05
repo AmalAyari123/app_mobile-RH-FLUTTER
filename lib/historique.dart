@@ -131,7 +131,7 @@ class _HistoriqueState extends State<Historique> {
                         borderRadius:
                             BorderRadius.circular(5), // Set border radius
                       ),
-                      padding: EdgeInsets.only(left: 10),
+                      padding: EdgeInsets.only(left: 10, right: 10),
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 8,
@@ -156,6 +156,35 @@ class _HistoriqueState extends State<Historique> {
                             color: Colors.blue.shade700,
                           ),
                         ),
+                        trailing: demandes?[index].status == 'En Attente'
+                            ? GestureDetector(
+                                onTap: () {
+                                  deleteDemandeController(
+                                      context,
+                                      demandes![index].id!,
+                                      index,
+                                      providerUser);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: Colors.red), // Red border
+                                  ),
+                                  child: Text(
+                                    "Annuler",
+                                    textAlign: TextAlign.center,
+                                    style: SafeGoogleFont(
+                                      'Lato',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromARGB(255, 209, 59, 59),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : null,
                       ),
                     );
                   }),

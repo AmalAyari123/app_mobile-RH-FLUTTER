@@ -93,14 +93,20 @@ class _DemandsState extends State<Demands> {
                           ),
                         ),
                       ),
-                      subtitle: Text(
-                        demandes?[index].status ?? '',
-                        style: SafeGoogleFont(
-                          'Lato',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue.shade700,
-                        ),
+                      subtitle: Row(
+                        children: [
+                          _buildStatusIndicator(demandes?[index].status),
+                          SizedBox(width: 5),
+                          Text(
+                            demandes?[index].status ?? '',
+                            style: SafeGoogleFont(
+                              'Lato',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                        ],
                       ),
                       trailing: IconButton(
                         icon: const Icon(
@@ -201,4 +207,32 @@ class _YourAppBarState extends State<YourAppBar> {
       ],
     );
   }
+}
+
+Widget _buildStatusIndicator(String? status) {
+  Color color;
+  switch (status) {
+    case 'Accepté':
+      color = const Color.fromARGB(255, 72, 211, 76);
+      break;
+    case 'En Attente':
+      color = Colors.blue;
+      break;
+    case 'Refusé':
+      color = Colors.red;
+      break;
+    default:
+      color = Colors.transparent;
+      break;
+  }
+
+  return Container(
+    width: 15,
+    height: 15,
+    margin: EdgeInsets.only(right: 8.0), // Adjust margin as needed
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: color,
+    ),
+  );
 }

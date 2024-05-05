@@ -74,3 +74,19 @@ Future<http.Response> createDemande(Demande demande, String token) async {
   client.close();
   return response;
 }
+
+Future<http.Response> deleteDemande(int id) async {
+  var url = Uri.parse('http://${ipadress}:3000/demande/$id');
+
+  final client = http.Client();
+
+  var response = await client.delete(
+    headers: {
+      'Content-Type': 'application/json',
+      // Include the auth token here
+    },
+    url,
+  );
+  client.close();
+  return response;
+}

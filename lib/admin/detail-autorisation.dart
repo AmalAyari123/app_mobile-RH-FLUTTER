@@ -1,4 +1,4 @@
-/*import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +13,8 @@ class AutorisationDetails extends StatefulWidget {
   final User? user;
   final int? index;
   final Autorisation? autorisation;
-  const AutorisationDetails({super.key, this.user, this.index, this.autorisation});
+  const AutorisationDetails(
+      {super.key, this.user, this.index, this.autorisation});
 
   @override
   State<AutorisationDetails> createState() => _AutorisationDetailsState();
@@ -23,22 +24,24 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
   TextEditingController heureDebutController = TextEditingController();
 
   TextEditingController heureFinController = TextEditingController();
-
+  TextEditingController jourController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    DateTime? heureDebut = widget.autorisation!.heureFin;
-    DateTime? heureFin = widget.autorisation!.heureDebut;
+    DateTime? heureDebut = widget.autorisation!.heureDebut;
+    DateTime? heureFin = widget.autorisation!.heureFin;
+    DateTime? jour = widget.autorisation!.jour;
 
-    String formattedDateDebut =
-        DateFormat('yyyy-MM-dd HH:mm').format(dateDebut!);
-    String formattedDateFin = DateFormat('yyyy-MM-dd HH:mm').format(dateFin!);
+    String formattedDateDebut = DateFormat('HH:mm').format(heureDebut!);
+
+    String formattedjour = DateFormat('yyyy-MM-dd').format(jour!);
+    String formattedDateFin = DateFormat('HH:mm').format(heureFin!);
     // Initialize controllers with initial values
-    heureDebutController = TextEditingController(text: heureDebut);
+    heureDebutController = TextEditingController(text: formattedDateDebut);
     heureFinController = TextEditingController(text: formattedDateFin);
-   
+    jourController = TextEditingController(text: formattedjour);
   }
 
   // Add the appointment to the list
@@ -81,12 +84,45 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
               ],
             ),
             const SizedBox(height: 30),
+            TextField(
+                controller: jourController,
+                style: SafeGoogleFont(
+                  'Rubik',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                ),
+                decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 255, 255, 255),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide:
+                          const BorderSide(width: 1, color: Colors.grey),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    label: Text(
+                      "Le jour",
+                      style: SafeGoogleFont(
+                        'Lato',
+                        fontSize: 22,
+                        fontWeight: FontWeight.w500,
+                        color: const Color.fromARGB(255, 70, 105, 140),
+                      ),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    contentPadding:
+                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
+            SizedBox(height: 30),
             Row(
               children: [
                 SizedBox(
                   width: 172,
                   child: TextField(
-                      controller: dateDebutController,
+                      controller: heureDebutController,
                       readOnly: true,
                       style: SafeGoogleFont(
                         'Rubik',
@@ -107,7 +143,7 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
                           label: Text(
-                            "Date de début",
+                            "heure de début",
                             style: SafeGoogleFont(
                               'Lato',
                               fontSize: 22,
@@ -123,7 +159,7 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
                 SizedBox(
                   width: 172,
                   child: TextField(
-                      controller: dateFinController,
+                      controller: heureFinController,
                       readOnly: true,
                       style: SafeGoogleFont(
                         'Rubik',
@@ -144,7 +180,7 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
                             borderSide: const BorderSide(color: Colors.grey),
                           ),
                           label: Text(
-                            "Date de fin",
+                            "Heure de fin",
                             style: SafeGoogleFont(
                               'Lato',
                               fontSize: 22,
@@ -158,166 +194,32 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
                 ),
               ],
             ),
-            const SizedBox(height: 22),
-            TextField(
-                controller: TypeController,
-                readOnly: true,
-                style: SafeGoogleFont(
-                  'Rubik',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Type de congés",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                        color: const Color.fromARGB(255, 70, 105, 140),
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    contentPadding:
-                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
-            const SizedBox(height: 22),
-            TextField(
-                controller: commentaireController,
-                readOnly: true,
-                style: SafeGoogleFont(
-                  'Rubik',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Commentaire",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                        color: const Color.fromARGB(255, 70, 105, 140),
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    contentPadding:
-                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
-            const SizedBox(height: 22),
-            TextButton(
-              onPressed: () {},
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.transparent),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    side: const BorderSide(color: Colors.grey),
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.image,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(
-                      width: 8), // Add some space between the icon and text
-                  Text(
-                    "Voir justificatif",
-                    style: SafeGoogleFont(
-                      'Lato',
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                      color: const Color.fromARGB(255, 70, 105, 140),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 22),
-            TextField(
-                controller: LaissercommentaireController,
-                style: SafeGoogleFont(
-                  'Rubik',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                ),
-                decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide:
-                          const BorderSide(width: 1, color: Colors.grey),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    label: Text(
-                      "Laissez un commentaire",
-                      style: SafeGoogleFont(
-                        'Lato',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                        color: const Color.fromARGB(255, 70, 105, 140),
-                      ),
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    contentPadding:
-                        const EdgeInsets.only(top: 10, bottom: 10, left: 8))),
             const SizedBox(height: 60),
             Row(
               children: [
                 ElevatedButton(
                   onPressed: () {
                     if (widget.user!.userrole == "Chef département") {
-                      Demande? demande = widget.demande;
-                      demande!.repCommentaire =
-                          LaissercommentaireController.text;
-                      demande.status = 'Accepté par le chef département';
-                      updateDemandeController(context, demande, widget.index!,
-                          providerUser, widget.user!
+                      updateAutorisationController(
+                          context,
+                          widget.autorisation!,
+                          widget.index!,
+                          providerUser,
+                          widget.user!,
+                          'Accepté par le chef département'
                           // Set the status accordingly
                           );
                     } else {
-                      Demande? demande = widget.demande;
-                      demande!.repCommentaire =
-                          LaissercommentaireController.text;
-                      demande.status = 'Accepté';
-                      updateDemandeController(context, demande, widget.index!,
-                          providerUser, widget.user!
+                      updateAutorisationController(
+                          context,
+                          widget.autorisation!,
+                          widget.index!,
+                          providerUser,
+                          widget.user!,
+                          'Accepté'
                           // Set the status accordingly
                           );
-                      updateSolde(
-                          context, widget.index!, providerUser, widget.user!);
+                      Navigator.of(context).pop();
                     }
                   },
                   style: ButtonStyle(
@@ -355,14 +257,10 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
                 const SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Demande? demande = widget.demande;
-                    demande!.repCommentaire = LaissercommentaireController.text;
-                    demande.status = 'Refusé';
-                    updateDemandeController(context, demande, widget.index!,
-                        providerUser, widget.user!
+                    updateAutorisationController(context, widget.autorisation!,
+                        widget.index!, providerUser, widget.user!, 'Refusé'
                         // Pass the new status as a string
                         );
-                    Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
                     backgroundColor:
@@ -403,4 +301,4 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
       ),
     );
   }
-}*/
+}

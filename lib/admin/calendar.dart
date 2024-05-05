@@ -36,13 +36,15 @@ class _CalendarState extends State<Calendar> {
     List<Demande>? demandes = providerUser.demandes;
     getDemandeController(providerUser);
     DemandDataSource _dataSource = DemandDataSource(demandes, users);
+
     ProviderDepartement providerDepartement =
         context.watch<ProviderDepartement>();
     getDepartementsController(providerDepartement);
-    List<Autorisation>? autorisations = providerUser.autorisations;
 
+    List<Autorisation>? autorisations = providerUser.autorisations;
     getAutorisationController(providerUser);
     List<Departement>? departements = providerDepartement.departements;
+    AutDataSource _AutdataSource = AutDataSource(autorisations, users);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -123,39 +125,42 @@ class _CalendarState extends State<Calendar> {
                     },
                   ),
                 ),
-                WeekView(
-                    controller: EventController(),
-                    eventTileBuilder: (date, events, boundry, start, end) {
-                      // Return your widget to display as event tile.
-                      return Container();
-                    },
-                    fullDayEventBuilder: (events, date) {
-                      // Return your widget to display full day event view.
-                      return Container();
-                    },
-                    showLiveTimeLineInAllDays:
-                        true, // To display live time line in all pages in week view.
-                    width: MediaQuery.of(context).size.height / 1.9,
-// width of week view.
-                    minDay: DateTime(2023),
-                    maxDay: DateTime(2050),
-                    initialDay: DateTime(2024),
-                    heightPerMinute:
-                        1, // height occupied by 1 minute time span.
-                    eventArranger:
-                        const SideEventArranger(), // To define how simultaneous events will be arranged.
-                    onEventTap: (events, date) => print(events),
-                    onDateLongPress: (date) => print(date),
-                    // To change the first day of the week.
+                SfCalendar(
+                  view: CalendarView.week,
+                  firstDayOfWeek: 1,
+                  allowViewNavigation: false,
+                  cellBorderColor: Colors.transparent,
+                  monthViewSettings: const MonthViewSettings(
+                    numberOfWeeksInView: 3,
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment,
+                  ),
+                  dataSource: _AutdataSource,
+                  headerHeight: 60,
+                  headerStyle: const CalendarHeaderStyle(
+                      textStyle: TextStyle(fontSize: 23, fontFamily: 'Lato'),
+                      backgroundColor: Colors.white),
+                  appointmentBuilder: (BuildContext context,
+                      CalendarAppointmentDetails details) {
+                    String notes = details.appointments.first.notes;
+
+                    return Container(
+                      color: details.appointments.first.color,
+                      child: Center(
+                        child: Text(notes,
+                            style: const TextStyle(
+                                color: Color.fromARGB(255, 245, 242, 242),
+                                fontSize: 13)),
+                      ),
+                    );
+                  },
+                  timeSlotViewSettings: const TimeSlotViewSettings(
+                    numberOfDaysInView: 4,
+                    timeIntervalHeight: 70,
                     startHour: 8,
-
-                    // To set the first hour displayed (ex: 05:00)
-                    showVerticalLines:
-                        false, // Show the vertical line between days.
-
-                    weekPageHeaderBuilder:
-                        WeekHeader.hidden // To hide week header
-                    ),
+                    endHour: 18,
+                  ),
+                ),
               ]),
             ),
             Column(
@@ -165,16 +170,15 @@ class _CalendarState extends State<Calendar> {
                   child: Row(
                     children: [
                       Container(
-                        width: 10, // Adjust width according to your requirement
+                        width: 60, // Adjust width according to your requirement
                         height:
-                            10, // Adjust height according to your requirement
+                            6, // Adjust height according to your requirement
                         decoration: const BoxDecoration(
-                          color: const Color.fromARGB(187, 88, 242, 93),
-                          shape: BoxShape.circle,
+                          color: const Color.fromARGB(255, 72, 211, 76),
                         ),
                       ),
                       const SizedBox(
-                          width: 3), // Adjust the space between circle and text
+                          width: 5), // Adjust the space between circle and text
                       const Text(
                         "Accepté",
                         style: TextStyle(
@@ -186,16 +190,15 @@ class _CalendarState extends State<Calendar> {
                       const SizedBox(width: 18),
 
                       Container(
-                        width: 10, // Adjust width according to your requirement
+                        width: 60, // Adjust width according to your requirement
                         height:
-                            10, // Adjust height according to your requirement
+                            6, // Adjust height according to your requirement
                         decoration: const BoxDecoration(
                           color: const Color.fromARGB(255, 21, 107, 178),
-                          shape: BoxShape.circle,
                         ),
                       ),
                       const SizedBox(
-                          width: 3), // Adjust the space between circle and text
+                          width: 5), // Adjust the space between circle and text
                       const Text(
                         "En Attente",
                         style: TextStyle(
@@ -305,22 +308,22 @@ class DemandDataSource extends CalendarDataSource {
       : appointments = [] {
     if (demandes != null && users != null) {
       for (var demande in demandes) {
-        // Check if the demande's user ID is not the same as the current user's ID
+        if (demande.status != 'Refusé') {
+          User? user = users.firstWhere(
+            (user) => user.id == demande.userId,
+            orElse: () => User(id: -1, name: 'Unknown'),
+          );
+          Color appointmentColor = _getAppointmentColor(demande.status);
 
-        User? user = users.firstWhere(
-          (user) => user.id == demande.userId,
-          orElse: () => User(id: -1, name: 'Unknown'),
-        );
-        Color appointmentColor = _getAppointmentColor(demande.status);
+          Appointment appointment = Appointment(
+            color: appointmentColor,
+            startTime: demande.dateDebut!,
+            endTime: demande.dateFin!,
+            notes: user!.name ?? 'Unknown',
+          );
 
-        Appointment appointment = Appointment(
-          color: appointmentColor,
-          startTime: demande.dateDebut!,
-          endTime: demande.dateFin!,
-          notes: user!.name ?? 'Unknown',
-        );
-
-        appointments.add(appointment);
+          appointments.add(appointment);
+        }
       }
     }
   }
@@ -330,14 +333,43 @@ Color _getAppointmentColor(String? status) {
   switch (status) {
     case 'Accepté':
       return const Color.fromARGB(
-          184, 57, 165, 61); // Green color for accepted demands
+          255, 72, 211, 76); // Green color for accepted demands
     case 'Accepté par le chef département':
       return const Color.fromARGB(
-          184, 57, 165, 61); // Red color for rejected demands
+          255, 72, 211, 76); // Red color for rejected demands
     case 'En Attente':
-      return const Color.fromARGB(
-          255, 21, 107, 178); // Yellow color for pending demands
+      return Color.fromARGB(
+          255, 38, 135, 214); // Yellow color for pending demands
     default:
-      return Colors.grey; // Default color for other cases
+      return Colors.transparent; // Default color for other cases
+  }
+}
+
+class AutDataSource extends CalendarDataSource {
+  @override
+  final List<Appointment> appointments;
+
+  AutDataSource(List<Autorisation>? autorisations, List<User>? users)
+      : appointments = [] {
+    if (autorisations != null && users != null) {
+      for (var aut in autorisations) {
+        // Check if the demande's user ID is not the same as the current user's ID
+
+        User? user = users.firstWhere(
+          (user) => user.id == aut.userId,
+          orElse: () => User(id: -1, name: 'Unknown'),
+        );
+        Color appointmentColor = _getAppointmentColor(aut.status);
+
+        Appointment appointment = Appointment(
+          color: appointmentColor,
+          startTime: aut.heureDebut!,
+          endTime: aut.heureFin!,
+          notes: user!.name ?? 'Unknown',
+        );
+
+        appointments.add(appointment);
+      }
+    }
   }
 }

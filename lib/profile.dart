@@ -352,7 +352,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  value: departements!.isNotEmpty ?? false
+                  value: departements != null && departements!.isNotEmpty
                       ? departements!.first.name
                       : null, // Set default value
                   items: departements!

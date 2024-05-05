@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:myapp/Controller/demandeController.dart';
 import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
@@ -29,10 +31,36 @@ class _HomeeState extends State<Homee> {
   @override
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
+    List<User>? users = providerUser.employes;
+    getUsersController(providerUser);
+
+    List<Demande>? demandesD = providerUser.demandesD;
+    getDemandebyDepartementController(providerUser);
     getDemandeController(providerUser);
 
     getDemandebyDepartementController(providerUser);
     User? currentUser = providerUser.currentUser;
+    DateTime now = DateTime.now();
+
+    // Filter demandesD to find demandes with dateDebut or dateFin equal to today's date
+    String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+// Filter demandes based on formattedDate
+    List<Demande> todayDemandes = demandesD != null
+        ? demandesD!.where((demande) {
+            // Check if formattedDate is within the interval defined by dateDebut and dateFin
+            return (demande.dateDebut != null &&
+                    demande.dateFin != null &&
+                    demande.dateDebut!
+                        .isBefore(DateTime.parse(formattedDate)) &&
+                    demande.dateFin!.isAfter(DateTime.parse(formattedDate))) ||
+                // Include cases where formattedDate is equal to dateDebut or dateFin
+                (DateFormat('yyyy-MM-dd').format(demande.dateDebut!) ==
+                        formattedDate ||
+                    DateFormat('yyyy-MM-dd').format(demande.dateFin!) ==
+                        formattedDate);
+          }).toList()
+        : [];
+
     return Scaffold(
       appBar: AppBar(
         elevation: 6,
@@ -226,17 +254,60 @@ class _HomeeState extends State<Homee> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          "Aucune absence prévue.",
-                          style: SafeGoogleFont(
-                            'Lato',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: const Color.fromARGB(255, 135, 137, 140),
+                        const SizedBox(height: 2),
+                        if (todayDemandes.isEmpty)
+                          Container(
+                            child: Text(
+                              "Aucune absence prévue.",
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: const Color.fromARGB(255, 135, 137, 140),
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            height: 100,
+                            child: ListView.separated(
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(
+                                  width: 4,
+                                );
+                              },
+                              scrollDirection: Axis.horizontal,
+                              itemCount: todayDemandes.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                // Find the user whose ID matches demande.userId
+                                User? associatedUser = users?.firstWhere(
+                                  (user) =>
+                                      user.id == todayDemandes[index].userId,
+                                  orElse: () => User(id: -1, name: 'Unknown'),
+                                );
+                                // Display the user's name
+                                return Column(
+                                  children: [
+                                    Text(
+                                      associatedUser?.name ?? '',
+                                      style: const TextStyle(
+                                        fontFamily: 'Lato',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          associatedUser?.profilePic ?? ''),
+                                      radius: 30,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 26)
                       ])),
               const SizedBox(height: 15),
               Card(
