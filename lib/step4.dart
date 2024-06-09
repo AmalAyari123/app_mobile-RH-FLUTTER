@@ -39,7 +39,7 @@ class _StepFourState extends State<StepFour> {
           const SizedBox(height: 40),
           const Center(
             child: Text(
-              'Consultez votre historique et\n      votre solde de congés',
+              'Consulter votre historique et\n      votre solde de congés',
               style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,

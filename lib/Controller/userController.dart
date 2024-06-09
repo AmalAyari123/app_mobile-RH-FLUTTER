@@ -8,12 +8,15 @@ import 'package:http/http.dart' as http;
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Model/departement.dart';
 import 'package:myapp/Model/user.dart';
+import 'package:myapp/admin/env.dart';
 import 'package:myapp/logiin.dart';
 import 'dart:async';
 
 import 'package:myapp/service/userService.dart';
 
 Future getUsersController(ProviderUser providerUser) async {
+  print("get user");
+
   http.Response response = (await getUsers());
   List<User> employes = [];
 
@@ -29,6 +32,8 @@ Future getUsersController(ProviderUser providerUser) async {
 
 Future getDepartementsController(
     ProviderDepartement providerDepartement) async {
+  print("get departement");
+
   http.Response response = (await getDepartement());
   List<Departement> departements = [];
 
@@ -42,8 +47,31 @@ Future getDepartementsController(
   }
 }
 
+Future ResetSolde() async {
+  final url = Uri.parse('http://${ipadress}:3000/users/reset-solde-conge');
+
+  try {
+    final response = await http.post(url, headers: {
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      // Handle success
+      print('SoldeConge reset successfully');
+    } else {
+      // Handle error
+      print('Failed to reset SoldeConge: ${response.statusCode}');
+    }
+  } catch (e) {
+    // Handle exception
+    print('Error resetting SoldeConge: $e');
+  }
+}
+
 Future deleteUserController(
     BuildContext context, int id, int index, ProviderUser providerUser) async {
+  print("delete user");
+
   http.Response response = (await deleteUser(id, providerUser.token!));
   List<User>? employes = providerUser.employes;
 
@@ -69,6 +97,8 @@ Future deleteUserController(
 
 Future updateUserController(BuildContext context, User user, int index,
     ProviderUser providerUser) async {
+  print("update usr");
+
   http.Response response = (await update(user, providerUser.token!));
   List<User>? employes = providerUser.employes;
   print(response.body);
@@ -101,6 +131,8 @@ Future updateUserController(BuildContext context, User user, int index,
 
 Future updateCurrentUserController(
     BuildContext context, User user, ProviderUser providerUser) async {
+  print("update current");
+
   http.Response response = (await update(user, providerUser.token!));
   List<User>? employes = providerUser.employes;
   print(response.body);
@@ -142,6 +174,8 @@ Future updateCurrentUserController(
 
 Future createUser(
     BuildContext context, User user, ProviderUser providerUser) async {
+  print("create user");
+
   final response =
       await create(user); // Assuming create method returns a response
   List<User>? employes = providerUser.employes;
@@ -185,7 +219,35 @@ Future createUser(
   }
 }
 
-Future<void> logout(BuildContext context, ProviderUser providerUser) async {
+Future<void> setTokenStatus(int? userId, String status) async {
+  if (userId == null) {
+    print('User ID is null. Cannot update token status.');
+    return;
+  }
+
+  try {
+    var response = await http.post(
+      Uri.parse('http://${ipadress}:3000/notifications/set-token-status'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+        'status': status,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      throw Exception('success update token status');
+    }
+  } catch (e) {
+    print('Error updating token status: $e');
+    // Handle error appropriately
+  }
+}
+
+Future<void> logout(
+    BuildContext context, ProviderUser providerUser, int? id) async {
+  setTokenStatus(id, 'INACTIVE');
+
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(

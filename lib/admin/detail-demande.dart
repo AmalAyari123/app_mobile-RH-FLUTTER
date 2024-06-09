@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/Controller/demandeController.dart';
+import 'package:myapp/Controller/notifController.dart';
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/utils.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 
 class DemandeDetails extends StatefulWidget {
@@ -20,6 +24,8 @@ class DemandeDetails extends StatefulWidget {
 }
 
 class _DemandeDetailsState extends State<DemandeDetails> {
+  bool isImageVisible = false;
+
   TextEditingController dateDebutController = TextEditingController();
 
   TextEditingController dateFinController = TextEditingController();
@@ -50,6 +56,8 @@ class _DemandeDetailsState extends State<DemandeDetails> {
     String formattedDateDebut =
         DateFormat('yyyy-MM-dd  HH:mm').format(dateDebut!);
     String formattedDateFin = DateFormat('yyyy-MM-dd  HH:mm').format(dateFin!);
+    User? currentUser = providerUser.currentUser;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 252, 250, 250),
       resizeToAvoidBottomInset: false,
@@ -76,9 +84,10 @@ class _DemandeDetailsState extends State<DemandeDetails> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(widget.user!.profilePic ?? ''),
-                  radius: 30,
-                ),
+                    radius: 30, // Adjust the radius to your desired size
+                    backgroundImage: NetworkImage(widget.user!.avatarId != null
+                        ? "http://$ipadressurl/database-files/${widget.user!.avatarId!}"
+                        : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg')),
                 const SizedBox(width: 20),
                 Text(
                   widget.user!.name ?? '',
@@ -100,7 +109,7 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                   color: const Color.fromARGB(255, 150, 149, 149),
                 )),
             Container(
-                height: MediaQuery.of(context).size.height - 220,
+                height: MediaQuery.of(context).size.height - 250,
                 margin: const EdgeInsets.only(top: 10),
                 child: ListView(
                   padding: const EdgeInsets.all(7),
@@ -159,9 +168,9 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                                 ],
                               ),
                             ])),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
-                        color: Colors.white,
+                        color: const Color.fromARGB(255, 255, 255, 255),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -186,7 +195,7 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                                 ),
                               ),
                             ])),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
                         color: Colors.white,
                         child: Column(
@@ -213,7 +222,7 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                                 ),
                               ),
                             ])),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
                         color: Colors.white,
                         child: Column(
@@ -240,33 +249,44 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                                 ),
                               ),
                             ])),
-                    SizedBox(height: 20),
-                    Container(
-                        color: Colors.white,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "justificatif:",
-                                style: SafeGoogleFont(
-                                  'Lato',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      const Color.fromARGB(255, 70, 105, 140),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "${widget.demande!.justificatif ?? ''} ",
-                                style: SafeGoogleFont(
-                                  'Rubik',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
-                              ),
-                            ])),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                JustificatifScreen(demande: widget.demande),
+                          ),
+                        );
+                      },
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.image,
+                            color: Colors.grey, // Icon color
+                          ),
+                          SizedBox(
+                              width: 8), // Add spacing between icon and text
+                          Text(
+                            " voir justificatif",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color.fromARGB(255, 70, 105, 140),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     TextField(
                         controller: LaissercommentaireController,
@@ -291,7 +311,7 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                                   color: Color.fromARGB(255, 250, 248, 248)),
                             ),
                             label: Text(
-                              " Laiseer un commentaire :",
+                              " Laisser un commentaire :",
                               style: SafeGoogleFont(
                                 'Lato',
                                 fontSize: 20,
@@ -302,10 +322,10 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                             contentPadding: const EdgeInsets.only(
                                 top: 10, bottom: 10, left: 8))),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: () {
-                        if (widget.user!.userrole == "Chef département") {
+                        /* if (widget.user!.userrole == "Chef département") {
                           Demande? demande = widget.demande;
                           demande!.repCommentaire =
                               LaissercommentaireController.text;
@@ -314,18 +334,18 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                               widget.index!, providerUser, widget.user!
                               // Set the status accordingly
                               );
-                        } else {
-                          Demande? demande = widget.demande;
-                          demande!.repCommentaire =
-                              LaissercommentaireController.text;
-                          demande.status = 'Accepté';
-                          updateDemandeController(context, demande,
-                              widget.index!, providerUser, widget.user!
-                              // Set the status accordingly
-                              );
-                          updateSolde(context, widget.index!, providerUser,
-                              widget.user!);
-                        }
+                        } else {*/
+                        Demande? demande = widget.demande;
+                        demande!.repCommentaire =
+                            LaissercommentaireController.text;
+                        demande.status = 'Accepté';
+                        updateDemandeController(context, demande, widget.index!,
+                            providerUser, widget.user!
+                            // Set the status accordingly
+                            );
+
+                        sendPushNotification(widget.user!.id!, "Réponse",
+                            "${currentUser!.name} a accepté à votre demande");
                       },
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(
@@ -359,18 +379,20 @@ class _DemandeDetailsState extends State<DemandeDetails> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         Demande? demande = widget.demande;
                         demande!.repCommentaire =
                             LaissercommentaireController.text;
                         demande.status = 'Refusé';
-                        updateDemandeController(context, demande, widget.index!,
-                            providerUser, widget.user!
+                        updateDemandeChefController(context, demande,
+                            widget.index!, providerUser, widget.user!
                             // Pass the new status as a string
                             );
                         Navigator.of(context).pop();
+                        sendPushNotification(widget.user!.id!, "Réponse",
+                            "${currentUser!.name} le chef de département a refusé à votre demande");
                       },
                       style: ButtonStyle(
                         backgroundColor:
@@ -413,115 +435,45 @@ class _DemandeDetailsState extends State<DemandeDetails> {
   }
 }
 
+class JustificatifScreen extends StatelessWidget {
+  final Demande? demande;
 
-         
-           /* Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    if (widget.user!.userrole == "Chef département") {
-                      Demande? demande = widget.demande;
-                      demande!.repCommentaire =
-                          LaissercommentaireController.text;
-                      demande.status = 'Accepté par le chef département';
-                      updateDemandeController(context, demande, widget.index!,
-                          providerUser, widget.user!
-                          // Set the status accordingly
-                          );
-                    } else {
-                      Demande? demande = widget.demande;
-                      demande!.repCommentaire =
-                          LaissercommentaireController.text;
-                      demande.status = 'Accepté';
-                      updateDemandeController(context, demande, widget.index!,
-                          providerUser, widget.user!
-                          // Set the status accordingly
-                          );
-                      updateSolde(
-                          context, widget.index!, providerUser, widget.user!);
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.green),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+  JustificatifScreen({Key? key, this.demande}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Justificatif'),
+      ),
+      body: Center(
+        child: demande!.justificatifId != null
+            ? Image.network(
+                'http://${ipadressurl}/database-files/${demande!.justificatifId}',
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              )
+            : Builder(
+                builder: (context) {
+                  WidgetsBinding.instance!.addPostFrameCallback((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Il n'y a pas de justificatif!"),
+                        backgroundColor: Colors.blue.shade700,
+                        duration: Duration(seconds: 5),
                       ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check,
-                            color: Colors.white), // Add your icon here
-                        const SizedBox(
-                            width:
-                                8), // Add some space between the icon and text
-                        Text(
-                          "Accepter",
-                          style: SafeGoogleFont(
-                            'Lato',
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Demande? demande = widget.demande;
-                    demande!.repCommentaire = LaissercommentaireController.text;
-                    demande.status = 'Refusé';
-                    updateDemandeController(context, demande, widget.index!,
-                        providerUser, widget.user!
-                        // Pass the new status as a string
-                        );
-                    Navigator.of(context).pop();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.close,
-                            color: Colors.white), // Add your icon here
-                        const SizedBox(
-                            width:
-                                8), // Add some space between the icon and text
-                        Text(
-                          "Refuser",
-                          style: SafeGoogleFont(
-                            'Lato',
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+                    );
+                  });
+                  return SizedBox(); // Return an empty SizedBox
+                },
+              ),
       ),
     );
   }
-}*/
+}

@@ -12,7 +12,7 @@ class TacheGrid extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 16 / 7, crossAxisCount: 1, mainAxisSpacing: 25),
+            childAspectRatio: 18 / 7, crossAxisCount: 1, mainAxisSpacing: 25),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {

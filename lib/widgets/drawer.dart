@@ -7,6 +7,7 @@ import 'package:myapp/logiin.dart';
 import 'package:myapp/profile.dart';
 import 'package:myapp/utils.dart';
 import 'package:myapp/Authorisation.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -21,11 +22,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
     User? currentUser = providerUser.currentUser;
-    ProviderDepartement providerDepartement =
-        context.watch<ProviderDepartement>();
-    getDepartementsController(providerDepartement);
 
-    getUsersController(providerUser);
     return Drawer(
       child: Container(
         decoration: const BoxDecoration(
@@ -40,18 +37,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                      width: 80,
-                      height: 80,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/page-1/images/amal.jpg')) // Change the color as needed
-                          )),
+                    height: 85,
+                    width: 85,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        border: Border.all(color: Colors.white),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 201, 198, 198)
+                                .withOpacity(0.6),
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                        image: DecorationImage(
+                            image: NetworkImage(currentUser!.avatarId != null
+                                ? "http://$ipadressurl/database-files/${currentUser.avatarId!}"
+                                : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
+                            fit: BoxFit.cover)),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 15),
                     child: Text(
-                      'Amal Ayari',
+                      '${currentUser!.name!}',
                       textAlign: TextAlign.center,
                       style: SafeGoogleFont(
                         'Lato',
@@ -142,10 +151,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
             ),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              ); // Close the drawer
+              logout(context, providerUser, currentUser!.id!);
             },
           ),
         ]),

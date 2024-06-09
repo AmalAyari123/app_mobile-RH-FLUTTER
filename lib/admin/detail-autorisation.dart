@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/Controller/AutorisationController.dart';
 import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/autorisation.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/utils.dart';
@@ -67,10 +68,22 @@ class _AutorisationDetailsState extends State<AutorisationDetails> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.user!.profilePic ?? ''),
-                  radius: 30,
-                ),
+                /* FutureBuilder<String?>(
+                 future: fetchProfilePicture(widget.user!.avatarId ?? 0),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData && snapshot.data != null) {
+                      return CircleAvatar(
+                        backgroundImage: NetworkImage(snapshot.data!),
+                      );
+                    } else {
+                      return CircleAvatar(
+                        child: Icon(Icons.person),
+                      );
+                    }
+                  },
+                ),*/
                 const SizedBox(width: 20),
                 Text(
                   widget.user!.name ?? '',

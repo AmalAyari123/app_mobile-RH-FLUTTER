@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/Model/tache.dart';
 import 'package:myapp/admin/Employe.dart';
 import 'package:myapp/admin/calendar.dart';
+import 'package:myapp/admin/dash.dart';
 import 'package:myapp/homee.dart';
 
 final List<Tache> tache = [
@@ -39,7 +40,7 @@ final List<Tache> tache = [
     customFunction: (BuildContext context) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const Homee()),
+        MaterialPageRoute(builder: (context) => const Dashboardd()),
       );
     },
   ),

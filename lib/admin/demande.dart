@@ -7,6 +7,7 @@ import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/admin/detail-demande.dart';
 import 'package:myapp/utils.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 
 class Demands extends StatefulWidget {
@@ -38,7 +39,6 @@ class _DemandsState extends State<Demands> {
 
     getUsersController(providerUser);
     List<Demande>? demandes = providerUser.demandes;
-    getDemandeController(providerUser);
     int enAttenteCount =
         demandes?.where((demande) => demande.status == "En Attente").length ??
             0;
@@ -47,24 +47,67 @@ class _DemandsState extends State<Demands> {
         resizeToAvoidBottomInset: false,
         appBar: YourAppBar(),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 10),
-            BlinkText(
-              'Vous avez ${enAttenteCount} demandes en attente!',
-              style: const TextStyle(
-                  fontSize: 18.0, color: Color.fromARGB(255, 82, 79, 79)),
-              endColor: const Color.fromARGB(255, 197, 33, 33),
+            Row(
+              children: [
+                Text(
+                  "Demandes",
+                  style: SafeGoogleFont(
+                    'Lato',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: const Color.fromARGB(255, 31, 31, 31),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  height: 40,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 158, 197, 228),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.only(
+                      left: 18, top: 7), // Adjust padding as needed
+                  child: Text(
+                    '$enAttenteCount',
+                    style: const TextStyle(
+                      color: Colors.white, // Text color
+                      fontSize: 16, // Adjust font size as needed
+                    ),
+                  ),
+                )
+              ],
             ),
             const SizedBox(height: 10),
+            Container(
+              height: 2,
+              width: double.infinity, // Takes the full width available
+              color: const Color.fromARGB(255, 228, 223, 223),
+            ),
             Container(
               height: MediaQuery.of(context).size.height - 210,
               margin: const EdgeInsets.only(top: 5),
               child: ListView.separated(
                   separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      height: 4,
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 4,
+                        ),
+                        Container(
+                          height: 2,
+                          width:
+                              double.infinity, // Takes the full width available
+                          color: Color.fromARGB(255, 228, 223, 223),
+                        ),
+                        SizedBox(
+                          height: 4,
+                        ),
+                      ],
                     );
                   },
                   itemCount: demandes?.length ?? 0,
@@ -79,9 +122,12 @@ class _DemandsState extends State<Demands> {
                         horizontal: 2,
                       ),
                       leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(associatedUser?.profilePic ?? ''),
-                        radius: 30,
+                        radius: 30, // Adjust the radius to your desired size
+                        backgroundImage: NetworkImage(associatedUser
+                                    ?.avatarId !=
+                                null
+                            ? "http://$ipadressurl/database-files/${associatedUser?.avatarId!}"
+                            : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
                       ),
                       title: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -96,7 +142,7 @@ class _DemandsState extends State<Demands> {
                       subtitle: Row(
                         children: [
                           _buildStatusIndicator(demandes?[index].status),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Text(
                             demandes?[index].status ?? '',
                             style: SafeGoogleFont(
@@ -215,6 +261,9 @@ Widget _buildStatusIndicator(String? status) {
     case 'Accepté':
       color = const Color.fromARGB(255, 72, 211, 76);
       break;
+    case 'Accepté par le chef dép':
+      color = Color.fromARGB(255, 238, 255, 0);
+      break;
     case 'En Attente':
       color = Colors.blue;
       break;
@@ -229,7 +278,7 @@ Widget _buildStatusIndicator(String? status) {
   return Container(
     width: 15,
     height: 15,
-    margin: EdgeInsets.only(right: 8.0), // Adjust margin as needed
+    margin: const EdgeInsets.only(right: 8.0), // Adjust margin as needed
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       color: color,

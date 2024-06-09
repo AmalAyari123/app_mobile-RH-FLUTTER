@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "755001541202",
+    "project_id": "conge-project-418f3",
+    "storage_bucket": "conge-project-418f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755001541202:android:9d677b983faf705808d58b",
+        "android_client_info": {
+          "package_name": "com.example.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAhiIG22GHW0u7HLH0LaDl1DeV0M5C86A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

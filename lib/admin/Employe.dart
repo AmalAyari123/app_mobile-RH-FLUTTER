@@ -10,6 +10,7 @@ import 'package:myapp/Model/user.dart';
 
 import 'package:myapp/admin/addUser.dart';
 import 'package:myapp/admin/update.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,10 +32,8 @@ class _HomePageState extends State<HomePage> {
     ProviderUser providerUser = context.watch<ProviderUser>();
     List<User>? users = providerUser.employes;
 
-    getUsersController(providerUser);
     ProviderDepartement providerDepartement =
         context.watch<ProviderDepartement>();
-    getDepartementsController(providerDepartement);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                       BackButton(
-                        color: Color.fromARGB(255, 125, 123, 123),
+                        color: Color.fromARGB(255, 253, 253, 253),
                       ),
                       SizedBox(width: 23),
                       Text(
@@ -126,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                     // Set background color of the body
 
                     SizedBox(
-                      height: MediaQuery.of(context).size.height - 275,
+                      height: MediaQuery.of(context).size.height - 319,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: ListView.separated(
@@ -194,9 +193,14 @@ class _HomePageState extends State<HomePage> {
                                       horizontal: 14,
                                     ),
                                     leading: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          users![index].profilePic ?? ''),
-                                      radius: 30,
+                                      radius:
+                                          30, // Adjust the radius to your desired size
+                                      backgroundImage: NetworkImage(users![
+                                                      index]
+                                                  .avatarId !=
+                                              null
+                                          ? "http://$ipadressurl/database-files/${users![index].avatarId!}"
+                                          : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
                                     ),
                                     title: Padding(
                                       padding: const EdgeInsets.symmetric(

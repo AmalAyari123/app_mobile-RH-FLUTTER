@@ -51,7 +51,7 @@ class _StepTwoState extends State<StepTwo> {
           const Padding(
             padding: EdgeInsets.all(20),
             child: Text(
-              'Nous Vous simplifions les demandes de permissions de sortir.Envoyez la demande et attendez la réponse. ',
+              'Nous vous simplifions les demandes de permissions de sortir.Envoyez la demande et attendez la réponse. ',
               style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w300,

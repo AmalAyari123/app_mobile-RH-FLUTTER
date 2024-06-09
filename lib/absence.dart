@@ -117,9 +117,7 @@ class _AbsenceeState extends State<Absencee> {
     ProviderUser providerUser = context.watch<ProviderUser>();
 
     List<Demande>? demandesD = providerUser.demandesD;
-    getDemandebyDepartementController(providerUser);
     List<User>? users = providerUser.employes;
-    getUsersController(providerUser);
     User? currentUser = providerUser.currentUser;
     DemandDataSource _dataSource =
         DemandDataSource(demandesD, users, currentUser);
@@ -387,7 +385,7 @@ class _AbsenceeState extends State<Absencee> {
                       headerHeight: 60,
                       headerStyle: const CalendarHeaderStyle(
                           textStyle:
-                              TextStyle(fontSize: 23, fontFamily: 'Lato'),
+                              TextStyle(fontSize: 25, fontFamily: 'Lato'),
                           backgroundColor: Colors.white),
                       appointmentBuilder: (BuildContext context,
                           CalendarAppointmentDetails details) {
@@ -398,8 +396,9 @@ class _AbsenceeState extends State<Absencee> {
                           child: Center(
                             child: Text(notes,
                                 style: TextStyle(
-                                    color: Color.fromARGB(255, 99, 98, 98),
-                                    fontSize: 12)),
+                                    color: Color.fromARGB(255, 120, 118, 118),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500)),
                           ),
                         );
                       },

@@ -1,12 +1,15 @@
 // ignore_for_file: camel_case_types
 
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/demandeController.dart';
 import 'package:myapp/Controller/providerUser.dart';
+import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 class solde extends StatefulWidget {
@@ -22,278 +25,383 @@ class _soldeState extends State<solde> {
   @override
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
-    User? currentUser = providerUser.currentUser;
+    List<Demande>? demandes = providerUser.demandes;
+
+    User? currentUser = providerUser!.currentUser!;
+
+    double sumCongesDeMaladie = demandes != null
+        ? demandes
+            .where((demande) =>
+                demande.type == "Congés de maladie" &&
+                demande.status == "Accepté")
+            .map((demande) => demande.count)
+            .fold(0, (previous, current) => previous + current!)
+        : 0;
+    // Calculate the progress value
+    double progressValue = (currentUser!.congeMaladie! / 4.0);
+
+    double sumCongesPayes = demandes != null
+        ? demandes
+            .where((demande) =>
+                demande.type == "Congés payés" &&
+                demande.status == "Accepté") // Perform the comparison
+            .map((demande) => demande.count!) // Cap the count at solde1
+            .fold(0, (previous, current) => previous + current!)
+        : 0;
+    double progressValue2 = (currentUser!.solde1! + currentUser!.soldeConge!) /
+        (currentUser!.solde1! + currentUser!.soldeConge! + sumCongesPayes);
+    double sumRecuperation = demandes != null
+        ? demandes
+            .where((demande) =>
+                demande.type == "Récupération" &&
+                demande.status == "Accepté") // Perform the comparison
+            .map((demande) => demande.count!) // Cap the count at solde1
+            .fold(0, (previous, current) => previous + current!)
+        : 0;
+    double progressValue3;
+
+    if (currentUser != null &&
+        currentUser!.recuperation != null &&
+        sumRecuperation != 0) {
+      progressValue3 = currentUser!.recuperation! /
+          (currentUser!.recuperation! + sumRecuperation);
+    } else {
+      progressValue3 =
+          0.0; // Set a default value in case of division by zero or null values
+    }
+
     return Scaffold(
         appBar: AppBar(
-            elevation: 9,
-            shadowColor: Colors.grey,
-            backgroundColor: const Color.fromRGBO(8, 65, 142, 1),
-            toolbarHeight: MediaQuery.of(context).size.height / 1.8,
-            leading: Container(),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.elliptical(50, 40.0),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20,
+              )),
+          elevation: 6,
+          shadowColor: Colors.grey,
+          automaticallyImplyLeading: false,
+          backgroundColor: const Color.fromRGBO(8, 65, 142, 1),
+          centerTitle: true,
+          title: Text(
+            "Solde de congés détaillé",
+            textAlign: TextAlign.center,
+            style: SafeGoogleFont(
+              'Lato',
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromARGB(255, 255, 255, 255),
+            ),
+          ),
+        ),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.grey, width: 0.3),
+            ),
+          ),
+          child: BottomNavigationBar(
+            selectedItemColor: Colors.grey[500], // Set to transparent
+
+            currentIndex: _currentIndex,
+            type: BottomNavigationBarType.fixed,
+            unselectedItemColor: Colors.grey[500],
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined, size: 30),
+                label: 'Accueil',
               ),
-            ),
-            flexibleSpace: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: kToolbarHeight),
-                Text(
-                  "Solde de congés total",
-                  textAlign: TextAlign.center,
-                  style: SafeGoogleFont(
-                    'Lato',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                  ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.add_circle,
+                  size: 40,
+                  color: Color.fromRGBO(8, 65, 142, 1),
                 ),
-              ],
-            ),
-            bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(10),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: 60, left: 10, right: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                label: 'Congés',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.history,
+                  size: 30,
+                ),
+                label: 'Historique',
+              ),
+            ],
+            onTap: (index) {
+              // Handle navigation based on the selected index
+              setState(() {
+                _currentIndex = index;
+              });
+
+              if (index == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Homee()),
+                );
+              } else if (index == 1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Absencee()),
+                );
+              } else if (index == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Historique()),
+                );
+              }
+            },
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    "assets/page-1/images/maladie.png",
+                    height: 50,
+                    width: 50,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    "Congé maladie ",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(255, 19, 20, 20),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Text(
+                    "${currentUser!.congeMaladie!} jours restants ",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(255, 111, 112, 112),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    "${sumCongesDeMaladie.toStringAsFixed(1)} jours pris  ",
+                    style: SafeGoogleFont(
+                      'Lato',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromARGB(255, 111, 112, 112),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 7),
+              LinearProgressIndicator(
+                value:
+                    progressValue, // Set the progress value here (between 0.0 and 1.0)
+                minHeight: 4, // Set the height of the line
+                backgroundColor:
+                    Colors.deepPurple.shade100, // Set the background color
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 182, 25, 17), // Set the progress color
+                ),
+              ),
+              const SizedBox(height: 17),
+              Container(
+                height: 2,
+                width: double.infinity, // Takes the full width available
+                color: const Color.fromARGB(255, 238, 231, 231),
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  Row(
                     children: [
-                      Column(
-                        children: [
-                          const Text(
-                            'Solde 2023',
-                            style: TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 20,
-                                color: Color.fromARGB(255, 249, 249, 249)),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            '${currentUser!.solde1!}',
-                            style: const TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 22,
-                                color: Color.fromARGB(255, 205, 203, 203)),
-                          ),
-                        ],
+                      Image.asset(
+                        "assets/page-1/images/calendar.png",
+                        height: 50,
+                        width: 50,
                       ),
-                      const SizedBox(width: 25),
-                      Column(
-                        children: [
-                          const Text(
-                            'Solde 2024',
-                            style: TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 20,
-                                color: Color.fromARGB(255, 249, 249, 249)),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${currentUser!.soldeConge!}',
-                            style: const TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: Color.fromARGB(255, 205, 203, 203)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 25),
-                      Column(
-                        children: [
-                          const Text(
-                            'Total',
-                            style: TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 24,
-                                color: Color.fromARGB(255, 255, 255, 255)),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${currentUser!.solde1! + currentUser!.soldeConge!}',
-                            style: const TextStyle(
-                                fontFamily: 'Lato',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 20,
-                                color: Color.fromARGB(255, 205, 203, 203)),
-                          ),
-                        ],
+                      const SizedBox(width: 5),
+                      Text(
+                        "Congés payés  ",
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 19, 20, 20),
+                        ),
                       ),
                     ],
                   ),
-                ))),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color.fromARGB(255, 244, 240, 240),
-          selectedItemColor: Colors.grey[500],
-          unselectedItemColor: Colors.grey[500],
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined, size: 30),
-              label: 'Accueil',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.add_circle,
-                size: 40,
-                color: Color.fromRGBO(8, 65, 142, 1),
-              ),
-              label: 'Congés',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.history,
-                size: 30,
-              ),
-              label: 'Historique',
-            ),
-          ],
-          onTap: (index) {
-            // Handle navigation based on the selected index
-            setState(() {
-              _currentIndex = index;
-            });
-
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Homee()),
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Absencee()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Historique()),
-              );
-            }
-          },
-        ),
-        body: const Padding(
-          padding: EdgeInsets.only(top: 30, left: 20),
-          child: Text(
-            "Le solde de l'année précédente est valable jusqu'à la fin de l'année 2024 ( 31-12-2024 ).",
-            style: TextStyle(
-                fontFamily: 'Lato',
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
-                color: Color.fromARGB(255, 100, 99, 99)),
-          ),
-        )
-
-        /*Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 35),
-            child: Center(
-              child: Text(
-                'Mon Solde De Congés',
-                style: SafeGoogleFont(
-                  'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  fontStyle: FontStyle.italic,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height - 280,
-            margin: const EdgeInsets.only(top: 150),
-            child: ListView(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              children: const [
-                Row(
-                  children: [
-                    Text(
-                      'Total',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 35,
-                          color: Color.fromARGB(166, 205, 30, 7)),
-                    ),
-                    Spacer(),
-                    Text(
-                      '24 jours',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          color: Color.fromARGB(166, 205, 30, 7)),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Text(
-                        'Congés Payés 2023',
-                        style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.black),
+                        "${currentUser!.solde1! + currentUser!.soldeConge!} jours restants ",
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 111, 112, 112),
+                        ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Text(
-                        '4 jours',
-                        style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Color.fromARGB(166, 14, 10, 10)),
+                        "${sumCongesPayes} jours pris ",
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 111, 112, 112),
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 15),
-                  Text(
-                    'Solde valable à fin de période (31/12/2024)',
-                    style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Color.fromARGB(166, 14, 10, 10)),
+                  const SizedBox(height: 7),
+                  LinearProgressIndicator(
+                    value:
+                        progressValue2, // Set the progress value here (between 0.0 and 1.0)
+                    minHeight: 4, // Set the height of the line
+                    backgroundColor:
+                        Colors.deepPurple.shade100, // Set the background color
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color.fromARGB(
+                          255, 91, 116, 226), // Set the progress color
+                    ),
                   ),
-                ]),
-                SizedBox(height: 50),
-                Row(
-                  children: [
-                    Text(
-                      'Congés Payés 2024',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 17),
+                  Container(
+                    height: 2,
+                    width: double.infinity, // Takes the full width available
+                    color: const Color.fromARGB(255, 238, 231, 231),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        "assets/page-1/images/calendarr.png",
+                        height: 50,
+                        width: 50,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        "Récupération  ",
+                        style: SafeGoogleFont(
+                          'Lato',
                           fontSize: 20,
-                          color: Colors.black),
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 19, 20, 20),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        "${currentUser!.recuperation ?? 0} jours restants ",
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 111, 112, 112),
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        "${sumRecuperation.toStringAsFixed(1)} jours pris ",
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromARGB(255, 111, 112, 112),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 7),
+                  LinearProgressIndicator(
+                    value:
+                        progressValue3, // Set the progress value here (between 0.0 and 1.0)
+                    minHeight: 4, // Set the height of the line
+                    backgroundColor:
+                        Colors.deepPurple.shade100, // Set the background color
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color.fromARGB(
+                          255, 23, 153, 47), // Set the progress color
                     ),
-                    Spacer(),
-                    Text(
-                      '20 jours',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Color.fromARGB(166, 14, 10, 10)),
-                    ),
-                  ],
+                  ),
+                  const SizedBox(height: 17),
+                  Container(
+                    height: 2,
+                    width: double.infinity, // Takes the full width available
+                    color: const Color.fromARGB(255, 238, 231, 231),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 50),
+              DefaultTextStyle(
+                style: const TextStyle(color: Colors.black),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '${currentUser!.solde1 ?? 0} jours  ',
+                        // Return empty text if none of the conditions are met
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: const Color.fromARGB(255, 34, 34, 37),
+                        ),
+                      ),
+                      TextSpan(
+                        text:
+                            'est votre transfert , inclu dans votre solde de congés payés ${DateTime.now().year}.',
+                        style: SafeGoogleFont(
+                          'Lato',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromARGB(255, 100, 99, 99),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          )
-        ],
-      ),*/
-        );
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Le solde de l'année précédente est valable jusqu'à la fin de l'année 2024 ( 31-12-2024 ).",
+                style: const TextStyle(
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 17,
+                    color: Color.fromARGB(255, 100, 99, 99)),
+              ),
+            ],
+          ),
+        ));
   }
 }
+
+
+              /*  Text(
+                "Le solde de l'année précédente est valable jusqu'à la fin de l'année 2024 ( 31-12-2024 ).",
+                style: TextStyle(
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 100, 99, 99)),
+              ),*/

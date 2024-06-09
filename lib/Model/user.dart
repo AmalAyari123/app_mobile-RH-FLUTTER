@@ -10,10 +10,12 @@ class User {
   String? companyGroup;
   double? soldeConge;
   double? solde1;
-  String? profilePic;
+  int? avatarId;
   Departement? departement;
   String? userrole;
   int? DepartmentId;
+  double? congeMaladie;
+  double? recuperation;
   List<Demande>? demandes;
 
   User(
@@ -25,8 +27,10 @@ class User {
       this.companyGroup,
       this.soldeConge,
       this.solde1,
-      this.profilePic,
+      this.avatarId,
       this.departement,
+      this.congeMaladie,
+      this.recuperation,
       this.userrole,
       this.DepartmentId,
       this.demandes});
@@ -39,8 +43,11 @@ class User {
     numCIN = json['NumCIN'];
     companyGroup = json['CompanyGroup'];
     soldeConge = json['SoldeConge']?.toDouble();
+    congeMaladie = json['congeMaladie']?.toDouble();
+
+    recuperation = json['recuperation']?.toDouble();
     solde1 = json['Solde1']?.toDouble();
-    profilePic = json['profilePic'];
+    avatarId = json['avatarId'];
     departement = json['departement'] != null
         ? Departement.fromJson(json['departement'])
         : null;
@@ -65,8 +72,11 @@ class User {
     data['NumCIN'] = numCIN;
     data['CompanyGroup'] = companyGroup;
     data['SoldeConge'] = soldeConge;
+    data['congeMaladie'] = congeMaladie;
+    data['recuperation'] = recuperation;
+
     data['Solde1'] = solde1;
-    data['profilePic'] = profilePic;
+    data['avatarId'] = avatarId;
     if (departement != null) {
       data['departement'] = departement!.toJson();
       // Convert Departement object to JSON

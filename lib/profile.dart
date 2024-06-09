@@ -9,6 +9,7 @@ import 'package:myapp/historique.dart';
 import 'package:myapp/homee.dart';
 import 'package:myapp/utils.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 
 class UpdateProfile extends StatefulWidget {
@@ -56,69 +57,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
     List<User>? users = providerUser.employes;
     ProviderDepartement providerDepartement =
         context.watch<ProviderDepartement>();
+    User? currentUser = providerUser.currentUser;
+    getDepartementsController(providerDepartement);
 
     List<Departement>? departements = providerDepartement.departements;
-    getDepartementsController(providerDepartement);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.grey, width: 0.3),
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.grey[500],
-          unselectedItemColor: Colors.grey[500],
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined, size: 30),
-              label: 'Accueil',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.add_circle,
-                size: 40,
-                color: Color.fromRGBO(8, 65, 142, 1),
-              ),
-              label: 'Congés',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.history,
-                size: 30,
-              ),
-              label: 'Historique',
-            ),
-          ],
-          onTap: (index) {
-            // Handle navigation based on the selected index
-            setState(() {
-              _currentIndex = index;
-            });
-
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Homee()),
-              );
-            } else if (index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Absencee()),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Historique()),
-              );
-            }
-          },
-        ),
-      ),
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
@@ -146,7 +91,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
         ),
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height - 190,
+        height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         margin: const EdgeInsets.only(top: 40),
         child: ListView(
@@ -154,23 +99,26 @@ class _UpdateProfileState extends State<UpdateProfile> {
             children: [
               Stack(alignment: AlignmentDirectional.center, children: [
                 Container(
-                    width: 130,
-                    height: 130,
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 4, color: Colors.white),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 201, 198, 198)
-                                .withOpacity(0.6),
-                            spreadRadius: 2,
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                        image: const DecorationImage(
-                            image:
-                                AssetImage('assets/page-1/images/amal.jpg')))),
+                  height: 150,
+                  width: 150,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(color: Colors.white),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 201, 198, 198)
+                              .withOpacity(0.6),
+                          spreadRadius: 2,
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                      image: DecorationImage(
+                          image: NetworkImage(currentUser!.avatarId != null
+                              ? "http://$ipadressurl/database-files/${currentUser.avatarId!}"
+                              : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
+                          fit: BoxFit.cover)),
+                ),
                 Positioned(
                     bottom: 0,
                     right: 120,
@@ -355,20 +303,22 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   value: departements != null && departements!.isNotEmpty
                       ? departements!.first.name
                       : null, // Set default value
-                  items: departements!
-                      .map((item) => DropdownMenuItem<String>(
-                            value: item.name,
-                            child: Text(
-                              item.name ?? '',
-                              style: SafeGoogleFont(
-                                'Rubik',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w300,
-                                color: const Color.fromARGB(255, 0, 0, 0),
-                              ),
-                            ),
-                          ))
-                      .toList(),
+                  items: departements != null
+                      ? departements!
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item.name,
+                                child: Text(
+                                  item.name ?? '',
+                                  style: SafeGoogleFont(
+                                    'Rubik',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w300,
+                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                  ),
+                                ),
+                              ))
+                          .toList()
+                      : [],
 
                   onChanged: (value) {
                     selectedDepartement = departements!.firstWhere(
@@ -436,7 +386,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                     )),
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               SizedBox(
                 width: 380,
                 child: TextButton(
@@ -465,7 +415,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       widget.currentuser.departement =
                           selectedDepartement != null
                               ? selectedDepartement
-                              : departements.first;
+                              : departements!.first;
 
                       updateCurrentUserController(
                           context, widget.currentuser, providerUser!);

@@ -32,6 +32,18 @@ Future<http.Response> getDepartement() async {
   return response;
 }
 
+Future<http.Response> Reset() async {
+  var url = Uri.parse('http://${ipadress}:3000/users/reset-solde-conge');
+
+  final client = http.Client();
+
+  var response = await client.get(
+    url,
+  );
+  client.close();
+  return response;
+}
+
 Future<http.Response> deleteUser(int id, String token) async {
   var url = Uri.parse('http://${ipadress}:3000/users/$id');
 

@@ -51,7 +51,7 @@ class _StepOneState extends State<StepOne> {
           const Padding(
             padding: EdgeInsets.all(20),
             child: Text(
-              'Nous Vous simplifions les demandes de congés.Envoyez la demande et attendez la réponse. ',
+              'Nous vous simplifions les demandes de congés.Veuillez envoyer votre demande et vous aurez un retour dans la journée. ',
               style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w300,

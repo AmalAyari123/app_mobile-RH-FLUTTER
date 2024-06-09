@@ -1,1 +1,1 @@
-String ipadress = "192.168.1.21";
+String ipadress = "192.168.1.12";

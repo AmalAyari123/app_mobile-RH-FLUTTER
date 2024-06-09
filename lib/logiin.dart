@@ -234,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           if (isLoading) // Show spinner if isLoading is true
             const SpinKitFadingFour(
-              duration: Duration(seconds: 5),
+              duration: Duration(seconds: 15),
               color: Color.fromRGBO(8, 65, 142, 1),
               size: 60.0, // Customize spinner size
             ),

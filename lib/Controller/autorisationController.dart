@@ -28,6 +28,8 @@ Future<http.Response> getAutorisation(String token) async {
 Future getAutorisationController(
   ProviderUser providerUser,
 ) async {
+  print("get autorisation");
+
   http.Response response = (await getAutorisation(providerUser.token!));
   List<Autorisation> autorisations = [];
 
@@ -65,6 +67,8 @@ Future updateAutorisationController(
     ProviderUser providerUser,
     User user,
     String newStatus) async {
+  print("update autorisation");
+
   http.Response response = (await updateAutorisationStatus(
       newStatus, autorisation, providerUser.token!));
   List<Autorisation>? autorisations = providerUser.autorisations;
@@ -104,6 +108,8 @@ Future<http.Response> createAutorisation(
 
 Future createAutorisationController(BuildContext context,
     Autorisation autorisation, ProviderUser providerUser) async {
+  print("create autorisation");
+
   final response = await createAutorisation(autorisation, providerUser.token!);
   List<Autorisation>? autorisations = providerUser.autorisations ?? [];
 

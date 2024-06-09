@@ -82,11 +82,11 @@ class _AutorisationsState extends State<Autorisations> {
                         vertical: 8,
                         horizontal: 2,
                       ),
-                      leading: CircleAvatar(
+                      /*leading: CircleAvatar(
                         backgroundImage:
                             NetworkImage(associatedUser?.profilePic ?? ''),
                         radius: 30,
-                      ),
+                      ),*/
                       title: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Text(

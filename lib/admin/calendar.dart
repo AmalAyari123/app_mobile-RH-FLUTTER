@@ -56,7 +56,7 @@ class _CalendarState extends State<Calendar> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(top: 50),
               child: Container(
                 decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 255, 255, 255),
@@ -89,7 +89,7 @@ class _CalendarState extends State<Calendar> {
               ),
             ),
             SizedBox(
-              height: MediaQuery.of(context).size.height - 135,
+              height: MediaQuery.of(context).size.height - 175,
               width: MediaQuery.of(context).size.height,
               child: TabBarView(children: [
                 Padding(
@@ -100,7 +100,7 @@ class _CalendarState extends State<Calendar> {
                     allowViewNavigation: false,
                     cellBorderColor: Colors.transparent,
                     monthViewSettings: const MonthViewSettings(
-                      numberOfWeeksInView: 3,
+                      numberOfWeeksInView: 4,
                       appointmentDisplayMode:
                           MonthAppointmentDisplayMode.appointment,
                     ),
@@ -114,6 +114,7 @@ class _CalendarState extends State<Calendar> {
                       String notes = details.appointments.first.notes;
 
                       return Container(
+                        height: 5,
                         color: details.appointments.first.color,
                         child: Center(
                           child: Text(notes,
@@ -339,7 +340,7 @@ Color _getAppointmentColor(String? status) {
           255, 72, 211, 76); // Red color for rejected demands
     case 'En Attente':
       return Color.fromARGB(
-          255, 38, 135, 214); // Yellow color for pending demands
+          255, 63, 146, 214); // Yellow color for pending demands
     default:
       return Colors.transparent; // Default color for other cases
   }

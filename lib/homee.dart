@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 
 import 'package:lottie/lottie.dart';
 import 'package:myapp/Controller/demandeController.dart';
+import 'package:myapp/Controller/notifController.dart';
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/demande.dart';
+import 'package:myapp/Model/notification.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/absence.dart';
 import 'package:myapp/historique.dart';
@@ -13,6 +15,7 @@ import 'package:myapp/notif.dart';
 import 'package:myapp/utils.dart';
 import 'package:myapp/widgets/drawer.dart';
 import 'package:myapp/solde.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -32,14 +35,13 @@ class _HomeeState extends State<Homee> {
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
     List<User>? users = providerUser.employes;
-    getUsersController(providerUser);
 
     List<Demande>? demandesD = providerUser.demandesD;
-    getDemandebyDepartementController(providerUser);
-    getDemandeController(providerUser);
 
-    getDemandebyDepartementController(providerUser);
     User? currentUser = providerUser.currentUser;
+
+    List<AppNotification>? notif = providerUser.notif;
+
     DateTime now = DateTime.now();
 
     // Filter demandesD to find demandes with dateDebut or dateFin equal to today's date
@@ -60,6 +62,10 @@ class _HomeeState extends State<Homee> {
                         formattedDate);
           }).toList()
         : [];
+    print(todayDemandes.length);
+    double progressValue2 =
+        ((currentUser?.solde1 ?? 0) + (currentUser?.soldeConge ?? 0)) /
+            (21.0 + (currentUser?.solde1 ?? 0));
 
     return Scaffold(
       appBar: AppBar(
@@ -99,13 +105,50 @@ class _HomeeState extends State<Homee> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return const Notif();
-              }));
-            },
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.notifications,
+                  size: 40,
+                ),
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    // Reset the unread count
+                    Future.microtask(() {
+                      Provider.of<ProviderUser>(context, listen: false)
+                          .resetUnreadCount();
+                    });
+                    return const Notif();
+                  }));
+                },
+              ),
+              if (Provider.of<ProviderUser>(context).unreadCount > 0)
+                Positioned(
+                  right: 11,
+                  top: 11,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      '${Provider.of<ProviderUser>(context).unreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -186,7 +229,9 @@ class _HomeeState extends State<Homee> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${currentUser!.name!}!',
+                    currentUser != null && currentUser.name != null
+                        ? '${currentUser.name}!'
+                        : '',
                     style: SafeGoogleFont(
                       'Roboto',
                       fontSize: 26,
@@ -235,16 +280,115 @@ class _HomeeState extends State<Homee> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 30.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset('assets/page-1/images/team.png',
+                                  width: 30, height: 40),
+                              const SizedBox(width: 11),
+                              Text(
+                                "Absence dans mon équipe aujourd'hui ",
+                                style: SafeGoogleFont(
+                                  'Lato',
+                                  fontSize: 17.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromARGB(255, 19, 20, 20),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (todayDemandes.length == 0)
+                            Text(
+                              "Aucune absence prévue.",
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 135, 137, 140),
+                              ),
+                            )
+                          else
+                            SizedBox(
+                              height: 93,
+                              child: ListView.separated(
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(
+                                    width: 10,
+                                  );
+                                },
+                                scrollDirection: Axis.horizontal,
+                                itemCount: todayDemandes.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  // Find the user whose ID matches demande.userId
+                                  User? associatedUser = users?.firstWhere(
+                                    (user) =>
+                                        user.id == todayDemandes[index].userId,
+                                    orElse: () => User(id: -1, name: 'Unknown'),
+                                  );
+                                  if (associatedUser != null &&
+                                      associatedUser.id == currentUser?.id) {
+                                    // If associatedUser is the currentUser, return an empty Container
+                                    return Container();
+                                  }
+
+                                  // Display the user's name
+                                  return Column(
+                                    children: [
+                                      Text(
+                                        associatedUser?.name ?? '',
+                                        style: const TextStyle(
+                                          fontFamily: 'Lato',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                          height: 65,
+                                          width: 65,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              image: DecorationImage(
+                                                image: NetworkImage(associatedUser!
+                                                            .avatarId !=
+                                                        null
+                                                    ? "http://$ipadressurl/database-files/${associatedUser.avatarId!}"
+                                                    : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
+                                                fit: BoxFit.cover,
+                                              ))),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                        ]),
+                  )),
+              const SizedBox(height: 20),
+              Card(
+                color: Colors.white,
+                elevation: 0.5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Image.asset('assets/page-1/images/team.png',
+                            Image.asset('assets/page-1/images/count.png',
                                 width: 30, height: 40),
-                            const SizedBox(width: 11),
+                            const SizedBox(width: 12),
                             Text(
-                              "Absence dans mon équipe aujourd'hui ",
+                              "Mon solde de congés payés ",
                               style: SafeGoogleFont(
                                 'Lato',
                                 fontSize: 17.5,
@@ -254,121 +398,41 @@ class _HomeeState extends State<Homee> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 2),
-                        if (todayDemandes.isEmpty)
-                          Container(
-                            child: Text(
-                              "Aucune absence prévue.",
+                        const SizedBox(height: 15),
+                        Row(
+                          children: [
+                            CircularPercentIndicator(
+                              percent: progressValue2,
+                              radius: 40,
+                              lineWidth: 4,
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor:
+                                  const Color.fromARGB(255, 8, 58, 108),
+                              backgroundColor: Colors.deepPurple.shade100,
+                              center: Text(
+                                "${(progressValue2 * 100).toStringAsFixed(1)} %",
+                                style: SafeGoogleFont(
+                                  'Lato',
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromARGB(255, 19, 20, 20),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 27),
+                            Text(
+                              "${currentUser!.solde1! + currentUser!.soldeConge!} jours à solder\n avant 31-12-2024",
                               style: SafeGoogleFont(
                                 'Lato',
                                 fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: const Color.fromARGB(255, 135, 137, 140),
                               ),
                             ),
-                          )
-                        else
-                          Container(
-                            height: 100,
-                            child: ListView.separated(
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(
-                                  width: 4,
-                                );
-                              },
-                              scrollDirection: Axis.horizontal,
-                              itemCount: todayDemandes.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                // Find the user whose ID matches demande.userId
-                                User? associatedUser = users?.firstWhere(
-                                  (user) =>
-                                      user.id == todayDemandes[index].userId,
-                                  orElse: () => User(id: -1, name: 'Unknown'),
-                                );
-                                // Display the user's name
-                                return Column(
-                                  children: [
-                                    Text(
-                                      associatedUser?.name ?? '',
-                                      style: const TextStyle(
-                                        fontFamily: 'Lato',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          associatedUser?.profilePic ?? ''),
-                                      radius: 30,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                      ])),
-              const SizedBox(height: 15),
-              Card(
-                color: Colors.white,
-                elevation: 0.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                          ],
+                        ),
+                      ]),
                 ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Image.asset('assets/page-1/images/count.png',
-                              width: 30, height: 40),
-                          const SizedBox(width: 12),
-                          Text(
-                            "Mon solde de congés ",
-                            style: SafeGoogleFont(
-                              'Lato',
-                              fontSize: 17.5,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromARGB(255, 19, 20, 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          CircularPercentIndicator(
-                            radius: 50,
-                            lineWidth: 6,
-                            circularStrokeCap: CircularStrokeCap.round,
-                            percent: 0.5,
-                            progressColor:
-                                const Color.fromARGB(255, 8, 58, 108),
-                            backgroundColor: Colors.deepPurple.shade100,
-                            center: Text(
-                              "50%",
-                              style: SafeGoogleFont(
-                                'Lato',
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: const Color.fromARGB(255, 19, 20, 20),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 27),
-                          Text(
-                            "${currentUser!.solde1! + currentUser!.soldeConge!} jours valables\n jusqu'à 31-12-2024",
-                            style: SafeGoogleFont(
-                              'Lato',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromARGB(255, 135, 137, 140),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ]),
               ),
               const SizedBox(height: 20),
               Card(

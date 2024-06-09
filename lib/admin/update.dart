@@ -2,11 +2,13 @@
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:myapp/Controller/demandeController.dart';
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Controller/userController.dart';
 import 'package:myapp/Model/departement.dart';
 import 'package:myapp/Model/user.dart';
 import 'package:myapp/utils.dart';
+import 'package:myapp/widgets/envv.dart';
 import 'package:provider/provider.dart';
 import 'package:supercharged/supercharged.dart';
 
@@ -66,11 +68,15 @@ class _UpdateState extends State<Update> {
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
     List<User>? users = providerUser.employes;
+
     ProviderDepartement providerDepartement =
         context.watch<ProviderDepartement>();
 
+    getDepartementsController(providerDepartement);
+
     List<Departement>? departements = providerDepartement.departements;
     DateTime now = DateTime.now();
+    User? currentUser = providerUser.currentUser;
 
     int currentYear = now.year;
     User? user = widget.user;
@@ -84,12 +90,14 @@ class _UpdateState extends State<Update> {
         body: ListView(
           padding: const EdgeInsets.only(left: 10, right: 10),
           children: [
-            Container(
-                width: 130,
-                height: 130,
+            Padding(
+              padding: const EdgeInsets.only(left: 120.0, right: 120),
+              child: Container(
+                height: 150,
+                width: 150,
                 decoration: BoxDecoration(
-                    border: Border.all(width: 4, color: Colors.white),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: Colors.white),
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromARGB(255, 201, 198, 198)
@@ -100,7 +108,12 @@ class _UpdateState extends State<Update> {
                       ),
                     ],
                     image: DecorationImage(
-                        image: NetworkImage(widget.user!.profilePic ?? '')))),
+                        image: NetworkImage(widget.user!.avatarId != null
+                            ? "http://$ipadressurl/database-files/${widget.user!.avatarId!}"
+                            : 'https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg'),
+                        fit: BoxFit.cover)),
+              ),
+            ),
             const SizedBox(height: 20),
             TextField(
                 controller: nameController,
@@ -248,20 +261,22 @@ class _UpdateState extends State<Update> {
               value: departements?.isNotEmpty ?? false
                   ? departements!.first.name
                   : null, // Set default value
-              items: departements!
-                  .map((item) => DropdownMenuItem<String>(
-                        value: item.name,
-                        child: Text(
-                          item.name ?? '',
-                          style: SafeGoogleFont(
-                            'Rubik',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w300,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                      ))
-                  .toList(),
+              items: departements != null
+                  ? departements!
+                      .map((item) => DropdownMenuItem<String>(
+                            value: item.name,
+                            child: Text(
+                              item.name ?? '',
+                              style: SafeGoogleFont(
+                                'Rubik',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ))
+                      .toList()
+                  : [],
 
               onChanged: (value) {
                 selectedDepartement = departements!.firstWhere(
@@ -456,7 +471,7 @@ class _UpdateState extends State<Update> {
                   // ignore: prefer_if_null_operators
                   user.departement = selectedDepartement != null
                       ? selectedDepartement
-                      : departements.first;
+                      : departements!.first;
 
                   updateUserController(
                       context, user, widget.index!, widget.providerUser!);

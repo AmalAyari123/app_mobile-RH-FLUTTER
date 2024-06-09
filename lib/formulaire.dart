@@ -1,9 +1,15 @@
 // ignore_for_file: must_be_immutable, prefer_final_fields, unused_field, avoid_print, use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:myapp/Controller/demandeController.dart';
+import 'package:myapp/Controller/notifController.dart';
 import 'package:myapp/Controller/providerUser.dart';
 import 'package:myapp/Model/demande.dart';
 import 'package:myapp/Model/user.dart';
@@ -50,27 +56,30 @@ class _FormulaireState extends State<Formulaire> {
     return dateFormat.format(datee);
   }
 
-  Future<void> _openGallery() async {
-    final imagePicker = ImagePicker();
-    final XFile? pickedFile = await imagePicker.pickImage(
-      source: ImageSource.gallery,
-    );
+  File? _image;
 
-    if (pickedFile != null) {
-      print('Image path: ${pickedFile.path}');
-    }
+  Future _openGallery() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      File? img = File(image.path);
+      setState(() {
+        _image = img;
+      });
+    } on PlatformException {}
   }
 
   Future<void> _openCamera() async {
-    final imagePicker = ImagePicker();
-    final XFile? pickedFile = await imagePicker.pickImage(
-      source: ImageSource.camera,
-    );
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (image == null) return;
 
-    if (pickedFile != null) {
-      print('Image path: ${pickedFile.path}');
-    }
-    Navigator.pop(context);
+      File? img = File(image.path);
+      setState(() {
+        _image = img;
+      });
+    } on PlatformException {}
   }
 
   void _showOptions() {
@@ -104,6 +113,56 @@ class _FormulaireState extends State<Formulaire> {
   Widget build(BuildContext context) {
     ProviderUser providerUser = context.watch<ProviderUser>();
     User? currentUser = providerUser.currentUser;
+    List<User>? users = providerUser.employes;
+
+    String getRemainingSolde() {
+      double solde1 = currentUser!.solde1 ?? 0;
+      double soldeConge = currentUser!.soldeConge ?? 0;
+      double congeMaladie = currentUser!.congeMaladie ?? 0;
+      double recuperation = currentUser!.recuperation ?? 0;
+
+      if (dropdownvalue3 == 'Congés de maladie') {
+        return '${congeMaladie - (((dropdownvalue == '9:00' && dropdownvalue2 == '14:00') || (dropdownvalue == '14:00' && dropdownvalue2 == '18:00')) ? count - 0.5 : (dropdownvalue == '14:00' && dropdownvalue2 == '14:00') ? count - 1 : count)} jours';
+      } else if (dropdownvalue3 == 'Congés payés') {
+        return '${solde1 + soldeConge - (((dropdownvalue == '9:00' && dropdownvalue2 == '14:00') || (dropdownvalue == '14:00' && dropdownvalue2 == '18:00')) ? count - 0.5 : (dropdownvalue == '14:00' && dropdownvalue2 == '14:00') ? count - 1 : count)} jours';
+      } else if (dropdownvalue3 == 'Récupération') {
+        return '${recuperation - (((dropdownvalue == '9:00' && dropdownvalue2 == '14:00') || (dropdownvalue == '14:00' && dropdownvalue2 == '18:00')) ? count - 0.5 : (dropdownvalue == '14:00' && dropdownvalue2 == '14:00') ? count - 1 : count)} jours';
+      } else {
+        return '';
+      }
+    }
+
+    User? chefDepartement;
+    if (currentUser != null && users != null) {
+      chefDepartement = users.firstWhere(
+        (user) => user.userrole!.trim() == "Chef département",
+        /* && // Trim whitespace
+            user.DepartmentId == currentUser.DepartmentId,*/
+        orElse: () => User(
+            id: -1,
+            name: 'Unknown',
+            userrole: '',
+            DepartmentId: -1), // Provide all required fields
+      );
+    }
+
+    print(chefDepartement!.id);
+
+    User? Admin;
+    if (currentUser != null && users != null) {
+      Admin = users.firstWhere(
+        (user) => user.userrole!.trim() == "Admin",
+        /* && // Trim whitespace
+            user.DepartmentId == currentUser.DepartmentId,*/
+        orElse: () => User(
+            id: -1,
+            name: 'Unknown',
+            userrole: '',
+            DepartmentId: -1), // Provide all required fields
+      );
+    }
+
+    print(Admin!.id);
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -191,7 +250,7 @@ class _FormulaireState extends State<Formulaire> {
         ),
         body: Column(children: [
           Container(
-              height: MediaQuery.of(context).size.height - 184.5,
+              height: MediaQuery.of(context).size.height - 194.5,
               margin: const EdgeInsets.only(top: 10),
               child: ListView(
                 padding: const EdgeInsets.only(left: 10, right: 10),
@@ -366,21 +425,87 @@ class _FormulaireState extends State<Formulaire> {
                               ),
                             ),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'Congés de maladie',
-                            child: Text('Congés de maladie'),
+                            child: Text('Congés de maladie',
+                                style: SafeGoogleFont(
+                                  'Lato',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromARGB(255, 17, 17, 18),
+                                )),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'Télétravail',
-                            child: Text('Télétravail'),
+                            child: Text(
+                              'Télétravail',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'Raison de famille',
-                            child: Text('Raison de famille'),
+                            child: Text(
+                              'Raison de famille',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
                           ),
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: 'Congés de Maternité',
-                            child: Text('Congés de Maternité'),
+                            child: Text(
+                              'Congés de Maternité',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'Récupération',
+                            child: Text(
+                              'Récupération',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'Décès',
+                            child: Text(
+                              'Décès',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'Autres',
+                            child: Text(
+                              'Autres',
+                              style: SafeGoogleFont(
+                                'Lato',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromARGB(255, 17, 17, 18),
+                              ),
+                            ),
                           ),
                         ],
                         onChanged: (String? newValue) {
@@ -436,29 +561,42 @@ class _FormulaireState extends State<Formulaire> {
                   ),
                   const SizedBox(height: 5),
                   Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 248, 246, 246),
-                      borderRadius: BorderRadius.circular(5.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 201, 198, 198)
-                              .withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 0.4,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.add_a_photo,
-                        color: Color.fromARGB(255, 34, 34, 37),
-                        size: 35,
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 248, 246, 246),
+                        borderRadius: BorderRadius.circular(5.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 201, 198, 198)
+                                .withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 0.4,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                      onPressed: _showOptions,
-                    ),
-                  ),
+                      child: _image == null
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.add_a_photo,
+                                color: Color.fromARGB(255, 34, 34, 37),
+                                size: 35,
+                              ),
+                              onPressed: _showOptions,
+                            )
+                          : Container(
+                              height: 120,
+                              alignment: Alignment.topRight,
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: FileImage(_image!),
+                                      fit: BoxFit.contain)),
+                              child: IconButton(
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.black),
+                                onPressed: _showOptions,
+                              ),
+                            )),
                   const SizedBox(height: 10),
                   Text(
                     "Durée d'absence et solde ",
@@ -515,8 +653,13 @@ class _FormulaireState extends State<Formulaire> {
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text:
-                                      "Votre solde restant après l'approbation:\n",
+                                  text: dropdownvalue3 == 'Congés de maladie'
+                                      ? "Votre solde de congés de maladie après l'approbation:\n"
+                                      : dropdownvalue3 == 'Récupération'
+                                          ? "Votre solde de jours récupérables après l'approbation:\n"
+                                          : dropdownvalue3 == 'Congés payés'
+                                              ? "Votre solde restant après l'approbation:\n"
+                                              : "", // Return empty text if none of the conditions are met
                                   style: SafeGoogleFont(
                                     'Lato',
                                     fontSize: 19,
@@ -526,8 +669,7 @@ class _FormulaireState extends State<Formulaire> {
                                   ),
                                 ),
                                 TextSpan(
-                                  text:
-                                      "${currentUser!.solde1! + currentUser.soldeConge! - (((dropdownvalue == '9:00' && dropdownvalue2 == '14:00') || (dropdownvalue == '14:00' && dropdownvalue2 == '18:00')) ? count - 0.5 : (dropdownvalue == '14:00' && dropdownvalue2 == '14:00') ? count - 1 : count)} jours",
+                                  text: getRemainingSolde(),
                                   style: SafeGoogleFont(
                                     'Lato',
                                     fontSize: 18,
@@ -566,6 +708,24 @@ class _FormulaireState extends State<Formulaire> {
                           int hour2 = int.parse(dropdownvalue2.split(':')[0]);
                           int minute2 = int.parse(dropdownvalue2.split(':')[1]);
                           print(hour2);
+                          double newCount =
+                              count; // Default to the current count
+
+                          if (dropdownvalue3 != 'Congés de maladie' &&
+                              dropdownvalue3 != 'Congés payés' &&
+                              dropdownvalue3 != 'Récupération') {
+                            newCount = 0.0;
+                          } else {
+                            newCount = (((dropdownvalue == '9:00' &&
+                                        dropdownvalue2 == '14:00') ||
+                                    (dropdownvalue == '14:00' &&
+                                        dropdownvalue2 == '18:00'))
+                                ? count - 0.5
+                                : (dropdownvalue == '14:00' &&
+                                        dropdownvalue2 == '14:00')
+                                    ? count - 1
+                                    : count);
+                          }
 
                           DateTime combinedDateTime2 =
                               DateTime.utc(year2, month2, day2, hour2, minute2);
@@ -574,20 +734,74 @@ class _FormulaireState extends State<Formulaire> {
                             dateFin: combinedDateTime2,
                             type: dropdownvalue3,
                             commentaire: commentaire.text.toString(),
-                            count: (((dropdownvalue == '9:00' &&
-                                            dropdownvalue2 == '14:00') ||
-                                        (dropdownvalue == '14:00' &&
-                                            dropdownvalue2 == '18:00'))
-                                    ? count - 0.5
-                                    : (dropdownvalue == '14:00' &&
-                                            dropdownvalue2 == '14:00')
-                                        ? count - 1
-                                        : count)
-                                .toDouble(),
+                            count: newCount,
                           );
-
-                          await createDemandeController(
-                              context, newDemande, providerUser);
+                          if (dropdownvalue3 == 'Congés de maladie' &&
+                              (currentUser!.congeMaladie == null ||
+                                  count > currentUser.congeMaladie!)) {
+                            Get.snackbar(
+                              '', // Title
+                              "Votre solde de congés de maladie est insuffisant!", // Message
+                              backgroundColor: const Color.fromRGBO(
+                                  8, 65, 142, 1), // Background color
+                              colorText: Colors.white, // Text color
+                              snackPosition: SnackPosition.BOTTOM, // Position
+                              borderRadius: 10, // Border radius
+                              margin: const EdgeInsets.all(10), // Margin
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10), // Padding
+                              duration: const Duration(seconds: 3), // Duration
+                              animationDuration: const Duration(
+                                  milliseconds: 300), // Animation duration
+                            );
+                          } else if (dropdownvalue3 == 'Congés payés' &&
+                              (currentUser!.soldeConge == null ||
+                                  count > currentUser!.soldeConge!)) {
+                            Get.snackbar(
+                              '', // Title
+                              "Votre solde congés payés est insuffisant!", // Message
+                              backgroundColor: const Color.fromRGBO(
+                                  8, 65, 142, 1), // Background color
+                              colorText: Colors.white, // Text color
+                              snackPosition: SnackPosition.BOTTOM, // Position
+                              borderRadius: 10, // Border radius
+                              margin: const EdgeInsets.all(10), // Margin
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10), // Padding
+                              duration: const Duration(seconds: 3), // Duration
+                              animationDuration: const Duration(
+                                  milliseconds: 300), // Animation duration
+                            );
+                          } else if (dropdownvalue3 == 'Récupération' &&
+                              (currentUser!.recuperation == null ||
+                                  count > currentUser!.recuperation!)) {
+                            Get.snackbar(
+                              '', // Title
+                              "Votre solde des jours récupérables est insuffisant!", // Message
+                              backgroundColor: const Color.fromRGBO(
+                                  8, 65, 142, 1), // Background color
+                              colorText: Colors.white, // Text color
+                              snackPosition: SnackPosition.BOTTOM, // Position
+                              borderRadius: 10, // Border radius
+                              margin: const EdgeInsets.all(10), // Margin
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10), // Padding
+                              duration: const Duration(seconds: 3), // Duration
+                              animationDuration: const Duration(
+                                  milliseconds: 300), // Animation duration
+                            );
+                          } else {
+                            await createDemandeController(
+                                context, newDemande, providerUser);
+                            sendPushNotification(
+                                Admin!.id!,
+                                "Nouvelle demande!",
+                                "Vous avez une demande en attente d'approbation de la part de ${currentUser!.name!}");
+                            sendPushNotification(
+                                chefDepartement!.id!,
+                                "Nouvelle demande!",
+                                "Vous avez une demande en attente d'approbation de la part de ${currentUser!.name!}");
+                          }
                         },
                         style: TextButton.styleFrom(
                             backgroundColor:

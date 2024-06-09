@@ -126,7 +126,7 @@ class _AuthorisationState extends State<Authorisation> {
         backgroundColor: const Color.fromRGBO(8, 65, 142, 1),
         centerTitle: true,
         title: Text(
-          "Permission de sortir",
+          "Permission de sortie",
           textAlign: TextAlign.center,
           style: SafeGoogleFont(
             'Lato',
@@ -139,7 +139,7 @@ class _AuthorisationState extends State<Authorisation> {
       body: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height - 204,
+            height: MediaQuery.of(context).size.height - 213,
             margin: const EdgeInsets.only(top: 30),
             child: ListView(
                 padding: const EdgeInsets.only(left: 10, right: 10),

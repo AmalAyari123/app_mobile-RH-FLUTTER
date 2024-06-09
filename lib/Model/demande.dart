@@ -5,7 +5,7 @@ class Demande {
   DateTime? dateFin;
   String? type;
   String? commentaire;
-  String? justificatif;
+  int? justificatifId;
   String? status;
   int? id;
   int? userId;
@@ -17,7 +17,7 @@ class Demande {
       this.dateFin,
       this.type,
       this.commentaire,
-      this.justificatif,
+      this.justificatifId,
       this.status,
       this.id,
       this.userId,
@@ -31,7 +31,7 @@ class Demande {
         json['date_fin'] != null ? DateTime.parse(json['date_fin']) : null;
     type = json['type'];
     commentaire = json['commentaire'];
-    justificatif = json['justificatif'];
+    justificatifId = json['justificatifId'];
     status = json['status'];
     id = json['id'];
     userId = json['userId'];
@@ -47,7 +47,7 @@ class Demande {
         this.dateFin != null ? this.dateFin!.toIso8601String() : null;
     data['type'] = this.type;
     data['commentaire'] = this.commentaire;
-    data['justificatif'] = this.justificatif;
+    data['justificatifId'] = this.justificatifId;
     data['status'] = this.status;
     data['id'] = this.id;
     data['userId'] = this.userId;

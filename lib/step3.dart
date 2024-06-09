@@ -40,7 +40,7 @@ class _StepThreeState extends State<StepThree> {
           const SizedBox(height: 40),
           const Center(
             child: Text(
-              'Demander du télétravail',
+              'Demander du télé travail',
               style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
